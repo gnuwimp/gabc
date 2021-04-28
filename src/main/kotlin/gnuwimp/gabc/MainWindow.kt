@@ -1,24 +1,12 @@
 /*
- * Copyright 2016 - 2019 gnuwimp@gmail.com
+ * Copyright 2016 - 2021 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
 package gnuwimp.gabc
 
-import gnuwimp.core.extension.isImage
-import gnuwimp.core.extension.tryDelete
-import gnuwimp.core.swing.AboutHandler
-import gnuwimp.core.swing.ComboBoxCallback
-import gnuwimp.core.swing.LayoutPanel
-import gnuwimp.core.swing.Platform
-import gnuwimp.core.swing.dialog.ImageFileDialog
-import gnuwimp.core.swing.dialog.ProgressDialog
-import gnuwimp.core.swing.dialog.TextDialog
-import gnuwimp.core.swing.extension.setFontForAll
-import gnuwimp.core.util.Progress
-import gnuwimp.core.util.ProgressAction
-import gnuwimp.core.util.Task
-import gnuwimp.core.util.throwFirstError
+import gnuwimp.swing.*
+import gnuwimp.util.*
 import java.awt.Frame
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
@@ -28,18 +16,15 @@ import java.util.prefs.Preferences
 import javax.swing.*
 import kotlin.system.exitProcess
 
-/**
- * Create and show main window for gABC
- */
-class MainWindow : JFrame(appName) {
+//------------------------------------------------------------------------------
+class MainWindow : JFrame(APP_NAME) {
     companion object {
-        const val debug = false
-        const val appName = "gABC"
-        const val aboutApp = "About gABC"
-        const val about: String = "<html>" +
-                "<h2>gABC 2.0</h2>" +
+        const val APP_NAME = "gABC"
+        const val ABOUT_APP = "About gABC"
+        const val ABOUT_TEXT: String = "<html>" +
+                "<h2>gABC 2.1</h2>" +
                 "<font color=\"blue\">" +
-                "Copyright 2016 - 2019 gnuwimp@gmail.com.<br>" +
+                "Copyright 2016 - 2021 gnuwimp@gmail.com.<br>" +
                 "Released under the GNU General Public License v3.0.<br>" +
                 "See https://github.com/gnuwimp/gabc.<br>" +
                 "</font>" +
@@ -66,7 +51,7 @@ class MainWindow : JFrame(appName) {
     private var sourceDir         = File(System.getProperty("user.home"))
     private var destDir           = File(System.getProperty("user.home"))
     private var imageDir          = File(System.getProperty("user.home"))
-    private val main              = LayoutPanel(size = Platform.defFont.size / 2)
+    private val main              = LayoutPanel(size = Swing.defFont.size / 2)
     private val sourceLabel       = JLabel("Source:")
     private val sourceInput       = JTextField()
     private val sourceButton      = JButton("Browse")
@@ -85,22 +70,17 @@ class MainWindow : JFrame(appName) {
     private val yearLabel         = JLabel("Year:")
     private val yearInput         = JTextField()
     private val bitrateLabel      = JLabel("Bitrate:")
-    private val bitrateCombo      = ComboBoxCallback<String>(strings = listOf("24", "32", "40", "48", "56", "64", "80", "96", "112", "128", "192", "256", "320"), index = 1)
+    private val bitrateCombo      = ComboBox<String>(strings = listOf("24", "32", "40", "48", "56", "64", "80", "96", "112", "128", "192", "256", "320"), index = 1)
     private val aboutButton       = JButton("About")
     private val logButton         = JButton("Show Log")
     private val convertButton     = JButton("Convert")
     private val quitButton        = JButton("Quit")
 
-    /*
-     * Create window and event listeners
-     */
+    //--------------------------------------------------------------------------
     init {
         iconImage                  = Main.icon
         contentPane                = main
-        bitrateCombo.selectedIndex = 2
-        sourceInput.isEditable     = false
-        destInput.isEditable       = false
-        imageInput.isEditable      = false
+        bitrateCombo.selectedIndex = 3
 
         val w = 16
         var y = 1
@@ -157,53 +137,42 @@ class MainWindow : JFrame(appName) {
         titleInput.toolTipText    = "Set title for the audio book."
         yearInput.toolTipText     = "Set year for the audio book."
 
-        if (debug) {
-            sourceInput.text = "D:\\Tmp"
-            destInput.text = "D:\\Tmp"
-            imageInput.text = "D:\\Tmp\\cover.jpg"
-            authorInput.text = "J.K. Rowling"
-            titleInput.text = "Best of"
-            commentInput.text = "Read by Gnu"
-            yearInput.text = "1666"
-            bitrateCombo.selectedIndex = 3
-        }
-
-        // Quit application
+        //----------------------------------------------------------------------
         addWindowListener( object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 quit()
             }
         })
 
-        // Show about dialog box
+        //----------------------------------------------------------------------
         aboutButton.addActionListener {
-            AboutHandler(appName = aboutApp, aboutText = about).show(parent = this)
+            AboutHandler(appName = ABOUT_APP, aboutText = ABOUT_TEXT).show(parent = this)
         }
 
-        // Start conversion of mp3 files
+        //----------------------------------------------------------------------
         convertButton.addActionListener {
             var parameters = Parameters()
 
             try {
-                Platform.logMessage = ""
+                Swing.logMessage = ""
                 parameters = stage1SetParameters()
                 stage2LoadFiles(parameters)
                 stage3Transcoding(parameters)
 
-                Platform.logMessage = "transcoding finished successfully with file ${parameters.mp3.name}"
-                JOptionPane.showMessageDialog(this, "transcoding finished successfully with file ${parameters.mp3.name}", appName, JOptionPane.INFORMATION_MESSAGE)
+                Swing.logMessage = "transcoding finished successfully with file ${parameters.mp3.name}"
+                JOptionPane.showMessageDialog(this, "transcoding finished successfully with file ${parameters.mp3.name}", APP_NAME, JOptionPane.INFORMATION_MESSAGE)
             }
             catch (e: Exception) {
-                Platform.logMessage = e.message ?: "!"
-                JOptionPane.showMessageDialog(this, e.message, appName, JOptionPane.ERROR_MESSAGE)
-                parameters.mp3.tryDelete(maxTries = 100)
+                Swing.logMessage = e.message ?: "!"
+                JOptionPane.showMessageDialog(this, e.message, APP_NAME, JOptionPane.ERROR_MESSAGE)
+                parameters.mp3.remove()
             }
             finally {
                 System.gc()
             }
         }
 
-        // Select destination directory and save selected directory to preference
+        //----------------------------------------------------------------------
         destButton.addActionListener {
             val dialog = JFileChooser(destDir)
 
@@ -217,7 +186,7 @@ class MainWindow : JFrame(appName) {
             }
         }
 
-        // Select cover image and save image directory to preference
+        //----------------------------------------------------------------------
         imageButton.addActionListener {
             val dialog = ImageFileDialog(imageDir.canonicalPath, this)
 
@@ -229,18 +198,19 @@ class MainWindow : JFrame(appName) {
                 imageInput.text = file.canonicalPath
                 pref.imagePath = file.parentFile.canonicalPath
             }
-            else
+            else {
                 imageInput.text = ""
+            }
         }
 
-        // Show log dialog
+        //----------------------------------------------------------------------
         logButton.addActionListener {
-            val dialog = TextDialog(text = Platform.logMessage, showLastLine = true, title = "Log", parent = this)
+            val dialog = TextDialog(text = Swing.logMessage, showLastLine = true, title = "Log", parent = this)
 
             dialog.isVisible = true
         }
 
-        // Select source directory and save selected directory to preference
+        //----------------------------------------------------------------------
         sourceButton.addActionListener {
             val dialog = JFileChooser(sourceDir)
 
@@ -254,44 +224,38 @@ class MainWindow : JFrame(appName) {
             }
         }
 
-        // Quit gABC
+        //----------------------------------------------------------------------
         quitButton.addActionListener {
             quit()
         }
     }
 
-    /**
-     * Quit gABC and save also all preferences
-     */
+    //--------------------------------------------------------------------------
     fun quit() {
-        windowSave()
+        prefSave()
         isVisible = false
         dispose()
         exitProcess(status = 0)
     }
 
-    /**
-     * Check input parameters
-     */
+    //--------------------------------------------------------------------------
     private fun stage1SetParameters(): Parameters {
         val parameters = Parameters(
-                source  = sourceInput.text,
-                dest    = destInput.text,
-                cover   = imageInput.text,
-                author  = authorInput.text,
-                title   = titleInput.text,
-                year    = yearInput.text,
-                comment = commentInput.text,
-                bitrate = bitrateCombo.text
+            source  = sourceInput.text,
+            dest    = destInput.text,
+            cover   = imageInput.text,
+            author  = authorInput.text,
+            title   = titleInput.text,
+            year    = yearInput.text,
+            comment = commentInput.text,
+            bitrate = bitrateCombo.text
         )
 
         parameters.check()
         return parameters
     }
 
-    /**
-     * Load files from disk
-     */
+    //--------------------------------------------------------------------------
     private fun stage2LoadFiles(parameters: Parameters) {
         val files = File(parameters.source).listFiles()
 
@@ -301,31 +265,27 @@ class MainWindow : JFrame(appName) {
             }
         }
 
-        if (parameters.mp3Files.isEmpty())
+        if (parameters.mp3Files.isEmpty() == true) {
             throw Exception("error: no mp3 files in source directory")
+        }
     }
 
-    /**
-     * Transcode mp3 files to one file
-     */
+    //--------------------------------------------------------------------------
     private fun stage3Transcoding(parameters: Parameters) {
-        val tasks = mutableListOf<Task>()
-        tasks.add(TranscoderTask(parameters = parameters))
-        val progress = Progress(tasks = tasks, threadCount = 1)
-        val dialog = ProgressDialog(progress = progress, title = "Transcoding Files", parent = this)
+        val tasks    = mutableListOf<Task>(TranscoderTask(parameters = parameters))
+        val progress = TaskManager(tasks = tasks, threadCount = 1, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
+        val dialog   = TaskDialog(taskManager = progress, title = "Transcoding Files", type = TaskDialog.Type.PERCENT, parent = this)
 
         dialog.enableCancel = true
-        dialog.start(actionOnError = ProgressAction.JOIN, actionOnCancel = ProgressAction.JOIN, updateTime = 50L, setTitlePercent = true)
+        dialog.start(updateTime = 50L)
         tasks.throwFirstError()
     }
 
-    /**
-     * Restore some application data when starting program
-     */
-    fun windowRestore() {
+    //--------------------------------------------------------------------------
+    fun prefLoad(args: Array<String>) {
         defaultCloseOperation = DISPOSE_ON_CLOSE
         pack()
-        setFontForAll(Platform.defFont)
+        setFontForAll(Swing.defFont)
 
         val w  = pref.winWidth
         val h  = pref.winHeight
@@ -333,36 +293,71 @@ class MainWindow : JFrame(appName) {
         var y  = pref.winY
         val sc = Toolkit.getDefaultToolkit().screenSize
 
-        if (x > sc.getWidth() || x < -50)
+        if (x > sc.getWidth() || x < -50) {
             x = 0
+        }
 
-        if (y > sc.getHeight() || y < -50)
+        if (y > sc.getHeight() || y < -50) {
             y = 0
+        }
 
         setLocation(x, y)
         setSize(w, h)
 
-        if (pref.winMax)
+        if (pref.winMax) {
             extendedState = Frame.MAXIMIZED_BOTH
+        }
 
-        destDir = File(pref.destPath)
+        destDir   = File(pref.destPath)
         sourceDir = File(pref.sourcePath)
-        imageDir = File(pref.imagePath)
+        imageDir  = File(pref.imagePath)
+
+        try {
+            if (args.size > 0) {
+                sourceInput.text = args[0]
+            }
+
+            if (args.size > 1) {
+                destInput.text = args[1]
+            }
+
+            if (args.size > 2) {
+                imageInput.text = args[2]
+            }
+
+            if (args.size > 3) {
+                authorInput.text = args[3]
+            }
+
+            if (args.size > 4) {
+                titleInput.text = args[4]
+            }
+
+            if (args.size > 5) {
+                commentInput.text = args[5]
+            }
+
+            if (args.size > 6) {
+                yearInput.text = args[6]
+            }
+
+            if (args.size > 7) {
+                bitrateCombo.selectedIndex = args[7].toInt()
+            }
+        }
+        catch (e: Exception) {
+        }
     }
 
-    /**
-     * Save windows size and last used directories
-     */
-    private fun windowSave() {
+    //--------------------------------------------------------------------------
+    private fun prefSave() {
         try {
-            val size = size
-            val pos  = location
-
-            pref.winWidth = size.width
+            pref.winWidth  = size.width
             pref.winHeight = size.height
-            pref.winX = pos.x
-            pref.winY = pos.y
-            pref.winMax = (extendedState and Frame.MAXIMIZED_BOTH != 0)
+            pref.winX      = location.x
+            pref.winY      = location.y
+            pref.winMax    = (extendedState and Frame.MAXIMIZED_BOTH != 0)
+
             pref.flush()
         }
         catch (e: Exception) {
