@@ -13,18 +13,16 @@ The actual transcoding of audio files are done by [lame](http://lame.sourceforge
 It should run on all operating systems that has Java and lame installed.<br />
 Lame must be in application path.<br />
 
-<hr>
-
 ## License
-gABC is released under the [GNU General Public License v3.0](LICENSE).<br />
+gABC is released under the [GNU General Public License v3.0](LICENSE).
 
 ## Download
 Download from [here](https://github.com/gnuwimp/gabc/releases).<br />
 Download lame for windows at [rarewares](https://www.rarewares.org/mp3-lame-bundle.php).<br />
-Double click gabc.jar file on windows to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".
-You can also set the input fields from the command line "<code>java -jar c:\bin\gabc.jar D:\AudioBook D:\ D:\AudioBook\cover.jpg "Author" "Title" "Comment" 2001 3</code>".<br />
 
-<hr>
+## Run
+Double click gabc.jar file on windows to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".
+You can also set the input fields from the command line "<code>java -jar c:\bin\gabc.jar D:\AudioBook D:\ D:\AudioBook\cover.jpg "Author" "Title" "Comment" 2001 3</code>".
 
 ## Screenshots
 <img src="images/gabc.png" width="50%" height="50%"/>
