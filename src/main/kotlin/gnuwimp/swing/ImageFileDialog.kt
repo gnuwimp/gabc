@@ -98,7 +98,7 @@ private class PhotoPreview(fileChooser: JFileChooser) : JComponent() {
 //------------------------------------------------------------------------------
 
 /**
- * A file dialog for choosing a image.
+ * A file dialog for choosing an image.
  * File filter for the most used images is set.
  * And photo preview are turned on.
  */
@@ -114,8 +114,10 @@ class ImageFileDialog(val path: String, val parent: Component? = null) : JFileCh
         }
 
         fileFilter = object : FileFilter() {
+            //------------------------------------------------------------------
             override fun getDescription() = "Image Files"
 
+            //------------------------------------------------------------------
             override fun accept(file: File) = file.name.endsWith(".jpg") ||
                                               file.name.endsWith(".jpeg") ||
                                               file.name.endsWith(".gif") ||
@@ -123,8 +125,8 @@ class ImageFileDialog(val path: String, val parent: Component? = null) : JFileCh
                                               file.isDirectory
         }
 
-        accessory = PhotoPreview(this)
-        setFontForAll(Swing.defFont)
+        accessory  = PhotoPreview(this)
+        fontForAll = Swing.defFont
     }
 
     /**

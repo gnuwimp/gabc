@@ -3,9 +3,10 @@
  * Released under the GNU General Public License v3.0
  */
 
-package gnuwimp.gabc
+package gnuwimp.tomp3
 
 import gnuwimp.swing.Swing
+import java.awt.Font
 import java.awt.Image
 import java.awt.Toolkit
 import javax.swing.JOptionPane
@@ -21,8 +22,10 @@ object Main {
         try {
             Swing.setup(appName = MainWindow.ABOUT_APP, aboutText = MainWindow.ABOUT_TEXT, quitLambda = { quit() })
 
-            icon = "gnuwimp/gabc/gabc.png".loadImageFromResource()
-            window = MainWindow()
+            icon          = "gnuwimp/tomp3/tomp3.png".loadImageFromResource()
+            Swing.bigFont = Font(Font.SANS_SERIF, Font.PLAIN, 24)
+            Swing.defFont = Font(Font.SANS_SERIF, Font.PLAIN, 12)
+            window        = MainWindow()
         }
         catch(e: Exception) {
             e.printStackTrace()
@@ -49,6 +52,10 @@ object Main {
             SwingUtilities.invokeLater {
                 window.isVisible = true
                 window.prefLoad(args)
+
+                if (window.auto != 0) {
+                    window.run()
+                }
             }
         }
         catch(e: Exception) {

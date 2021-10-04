@@ -13,7 +13,7 @@ import javax.swing.WindowConstants
 
 /**
  * Base dialog window.
- * Dialog window cant be closed with window button.
+ * Dialog window can't be closed with window button.
  */
 abstract class BaseDialog(val parent: JFrame?, title: String, modal: Boolean) : JDialog(parent, title, modal) {
     init {
@@ -22,8 +22,7 @@ abstract class BaseDialog(val parent: JFrame?, title: String, modal: Boolean) : 
 
     /**
      * Center dialog window.
-     * If it has no parent then it will be centered on screen.
-     * Otherwise it will be centered on parent window.
+     * If it has no parent then it will be centered on screen, otherwise it will be centered on parent window.
      */
     fun centerWindow() {
         val sdim = Toolkit.getDefaultToolkit().screenSize
@@ -45,7 +44,7 @@ abstract class BaseDialog(val parent: JFrame?, title: String, modal: Boolean) : 
 
     /**
      * Center dialog window on top of parent window.
-     * Works only if dialog has an parent.
+     * Works only if dialog has a parent.
      */
     fun centerWindowOnTop() {
         require(parent != null)

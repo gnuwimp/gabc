@@ -58,8 +58,9 @@ val File.isImage: Boolean
         catch (e: Exception) {
         }
         finally {
-            return ret
         }
+
+        return ret
     }
 
 /**

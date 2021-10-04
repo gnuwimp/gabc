@@ -166,7 +166,7 @@ class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onError: 
 
     //--------------------------------------------------------------------------
     init {
-        require(threadCount > 0 && threadCount <= tasks.size)
+        require(threadCount > 0 && tasks.size > 0)
 
         total = tasks.sumByLong(Task::max)
 

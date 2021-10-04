@@ -16,7 +16,7 @@ import javax.swing.JProgressBar
 import kotlin.concurrent.timer
 
 /**
- * An dialog window that runs a TaskManager object.
+ * A dialog window that runs a TaskManager object.
  * Cancel button is disabled by default.
  */
 class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, parent: JFrame? = null, title: String = "Working...", modal: Boolean = true, width: Int = Swing.defFont.size * 60, height: Int = Swing.defFont.size * 16) : BaseDialog(parent, title, modal) {
@@ -79,13 +79,15 @@ class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, pa
                 panel.add(cancelButton,  x = -21,  y = -5,  w = 20,  h =  4)
             }
         }
-
-        setFontForAll(Swing.defFont)
-        progressLabel.font = Swing.bigFont
         pack()
-        size = Dimension(width, height)
+
+        fontForAll         = Swing.defFont
+        progressLabel.font = Swing.bigFont
+        size               = Dimension(width, height)
+
         centerWindow()
 
+        //----------------------------------------------------------------------
         cancelButton.addActionListener {
             cancel = true
         }

@@ -26,9 +26,9 @@ class TextDialog(text: String, showLastLine: Boolean = false, parent: JFrame? = 
         panel.add(closeButton,  x = -21,  y = -5,  w = 20,  h =  4)
         pack()
 
-        setFontForAll(Swing.defFont)
+        fontForAll          = Swing.defFont
         textView.isEditable = false
-        size = Dimension(width, height)
+        size                = Dimension(width, height)
         centerWindow()
 
         if (showLastLine && textView.document.length > 0)

@@ -3,7 +3,7 @@
  * Released under the GNU General Public License v3.0
  */
 
-package gnuwimp.gabc
+package gnuwimp.tomp3
 
 import java.io.File
 import java.util.prefs.Preferences
@@ -34,7 +34,7 @@ var Preferences.sourcePath: String
 
 //------------------------------------------------------------------------------
 var Preferences.winHeight: Int
-    get() = getInt("win_height", 340)
+    get() = getInt("win_height", 420)
 
     set(value) {
         putInt("win_height", value)

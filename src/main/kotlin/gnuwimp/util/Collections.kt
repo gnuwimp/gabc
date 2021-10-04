@@ -6,7 +6,77 @@
 package gnuwimp.util
 
 /**
- * Add numbers in collection and return it as an Long
+ * Find string in array
+ */
+fun Array<String>.find(find: String): Int {
+    var res = -1
+
+    for (string in this) {
+        res++
+
+        if (string == find) {
+            return res
+        }
+    }
+    return -1
+}
+
+/**
+ * Find double value in array
+ */
+fun Array<String>.findDouble(find: String, def: Double): Double {
+    val num = this.findString(find, "")
+
+    if (num == "") {
+        return def
+    }
+
+    return try {
+        num.toDouble()
+    }
+    catch (e: Exception) {
+        def
+    }
+}
+
+/**
+ * Find long value in array
+ */
+fun Array<String>.findInt(find: String, def: Long): Long {
+    val num = this.findString(find, "")
+
+    if (num == "") {
+        return def
+    }
+
+    return try {
+        num.toLong()
+    }
+    catch (e: Exception) {
+        def
+    }
+}
+
+/**
+ * Find string value in array
+ */
+fun Array<String>.findString(find: String, def: String): String {
+    var res = false
+
+    for (string in this) {
+        if (res == true) {
+            return string
+        }
+        else if (string == find) {
+            res = true
+        }
+    }
+
+    return def
+}
+
+/**
+ * Add numbers in collection and return it as a Long
  */
 fun <T> Iterable<T>.sumByLong(selector: (T) -> Long): Long {
     var sum = 0L
@@ -51,7 +121,7 @@ fun <K, V> Map<K, V>.joinKeys(stringSeperator: String = " "): String {
 
 
 /**
- * Append strings in an list to this list
+ * Append strings in a list to this list
  */
 fun MutableList<String>.append(strings: List<String>) {
     strings.forEach { this.add(it) }

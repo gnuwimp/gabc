@@ -80,7 +80,7 @@ object Swing {
         get() = !System.getProperty("os.name").toLowerCase().contains("mac")
 
     /**
-     * Return true if java is running in an unix like operating system.
+     * Return true if java is running in a unix like operating system.
      */
     val isUnix: Boolean
         get() = !System.getProperty("os.name").toLowerCase().contains("windows")
@@ -125,8 +125,13 @@ object Swing {
                 val aboutHandler = Proxy.newProxyInstance(Class.forName("com.apple.eawt.AboutHandler").classLoader, arrayOf(Class.forName("com.apple.eawt.AboutHandler")), AboutHandler(appName, aboutText))
                 val quitHandler  = Proxy.newProxyInstance(Class.forName("com.apple.eawt.QuitHandler").classLoader, arrayOf(Class.forName("com.apple.eawt.QuitHandler")), QuitHandler(quitLambda))
 
-                instance.javaClass.getMethod("setAboutHandler", *arrayOf(Class.forName("com.apple.eawt.AboutHandler"))).invoke(instance, *arrayOf(aboutHandler))
-                instance.javaClass.getMethod("setQuitHandler", *arrayOf(Class.forName("com.apple.eawt.QuitHandler"))).invoke(instance, *arrayOf(quitHandler))
+                instance.javaClass.getMethod("setAboutHandler", Class.forName("com.apple.eawt.AboutHandler")).invoke(instance,
+                    aboutHandler
+                )
+
+                instance.javaClass.getMethod("setQuitHandler", Class.forName("com.apple.eawt.QuitHandler")).invoke(instance,
+                    quitHandler
+                )
             }
         }
         catch (e: Exception) {

@@ -6,10 +6,7 @@
 package gnuwimp.swing
 
 import java.awt.Dimension
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.SwingConstants
+import javax.swing.*
 
 /**
  * A dialog for displaying some html text.
@@ -18,18 +15,19 @@ class HTMLDialog(html: String, parent: JFrame? = null, title: String = "", modal
     init {
         val panel       = LayoutPanel(size = Swing.defFont.size / 2)
         val label       = JLabel(html)
+        val scroll      = JScrollPane(label)
         val closeButton = JButton("Close")
 
         add(panel)
-        panel.add(label,       x =   1,  y =  1,  w = -1,  h = -6)
+        panel.add(scroll,      x =   1,  y =  1,  w = -1,  h = -6)
         panel.add(closeButton, x = -21,  y = -5,  w = 20,  h =  4)
         pack()
 
         label.lineBorder        = true
         label.verticalAlignment = SwingConstants.TOP
         size                    = Dimension(width, height)
+        fontForAll              = Swing.defFont
 
-        setFontForAll(Swing.defFont)
         centerWindow()
 
         //----------------------------------------------------------------------

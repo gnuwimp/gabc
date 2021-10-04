@@ -3,53 +3,75 @@
  * Released under the GNU General Public License v3.0
  */
 
-package gnuwimp.gabc
+package gnuwimp.tomp3
 
 import gnuwimp.swing.Swing
-import gnuwimp.util.Task
-import gnuwimp.util.getIntAt
-import gnuwimp.util.safeClose
-import gnuwimp.util.sumByLong
+import gnuwimp.util.*
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
 //------------------------------------------------------------------------------
-data class WavProperty(val sampleRate: String, val channels: Int, val channelString: String = if (channels == 1) "mono" else "stereo")
+data class WavProperty(val sampleRateString: String, val sampleRate: Int, val channels: Short, val channelString: String = if (channels == 1.toShort()) "mono" else "stereo", val bitWidth: Short, val data: Int)
 
 //------------------------------------------------------------------------------
-class TranscoderTask(val parameters: Parameters) : Task(max = parameters.mp3Files.sumByLong(File::length)) {
+class TranscoderTask(val parameters: Parameters) : Task(max = parameters.audioFiles.sumByLong(File::length)) {
     //--------------------------------------------------------------------------
     private fun createEncodeParams(wav: WavProperty): MutableList<String> {
         val list = mutableListOf<String>()
 
         list.add("lame")
-        list.add("--nohist")
-        list.add("--disptime")
-        list.add("0.2")
-        list.add("-m")
-        list.add("m")
-        list.add("-r")
-        list.add("-s")
-        list.add(wav.sampleRate)
-        list.add("-b")
-        list.add(parameters.bitrate)
+        list.add("--quiet")
 
-        if (wav.channels == 2) {
+        if (wav.channels == 1.toShort()) {
+            list.add("-m")
+            list.add("m")
+        }
+        else if (parameters.mono == true && wav.channels == 2.toShort()) {
+            list.add("-m")
+            list.add("m")
             list.add("-a")
         }
 
+        list.add("-r")
+        list.add("-s")
+        list.add(wav.sampleRateString)
+
+        if (parameters.vbr == true) {
+            list.add("-V")
+            list.add("0")
+            list.add("-B")
+            list.add(parameters.bitrate)
+            list.add("--bitwidth")
+            list.add("${wav.bitWidth}")
+        }
+        else {
+            list.add("--cbr")
+            list.add("-b")
+            list.add(parameters.bitrate)
+        }
+
         list.add("--id3v2-only")
+
         list.add("--ta")
         list.add(parameters.author)
+
         list.add("--tl")
         list.add(parameters.title)
+
         list.add("--tt")
         list.add(parameters.title)
-        list.add("--ty")
-        list.add(parameters.year)
-        list.add("--tg")
-        list.add("Audiobook")
+
+        if (parameters.year != "") {
+            list.add("--ty")
+            list.add(parameters.year)
+        }
+
+        if (parameters.genre.isNotBlank() == true) {
+            list.add("--tg")
+            list.add(parameters.genre)
+        }
+
         list.add("--tn")
         list.add("1/1")
 
@@ -71,66 +93,84 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.mp3File
 
     //--------------------------------------------------------------------------
     private fun parseWavHeader(buffer: ByteArray, size: Int): WavProperty {
-        val channelIndex     = 22
-        val samplerateIndex  = 24
-
         if (size < 50) {
-            throw Exception("error: to few bytes to parse")
+            throw Exception("error: to few bytes to parse the wav header")
         }
 
         if (buffer[0].toChar() != 'R' || buffer[1].toChar() != 'I' || buffer[2].toChar() != 'F' || buffer[3].toChar() != 'F') {
             throw Exception("error: this is not wav data")
         }
 
-        val channels = buffer[channelIndex].toInt()
+        val channels   = buffer[22].toShort()
+        val samplerate = buffer.getIntAt(24).toInt()
+        val bitwidth   = buffer[34].toShort()
 
         if (channels < 1 || channels > 2) {
             throw Exception("error: channel count ($channels) is out of range")
         }
 
-        val samplerate = when(val samplerate = buffer.getIntAt(samplerateIndex).toInt()) {
+        if (bitwidth != 8.toShort() && bitwidth != 16.toShort() && bitwidth != 24.toShort() && bitwidth != 32.toShort()) {
+            throw Exception("error: bitwidth ($bitwidth) is out of range")
+        }
+
+        val samplerateString = when(samplerate) {
             8000 -> "8"
             11025 ->  "11.025"
             12000 ->  "12"
             22050 ->  "22.050"
             24000 ->  "24"
             32000 ->  "32"
+            37800 ->  "37.8"
+            44056 ->  "44.056"
             44100 ->  "44.1"
             48000 ->  "48"
             64000 ->  "64"
             88200 ->  "88.2"
             96000 ->  "96"
+            176400 ->  "176.4"
+            192000 ->  "192"
             else -> throw Exception("error: samplerate ($samplerate) is out of range")
         }
 
-        return WavProperty(sampleRate = samplerate, channels = channels)
+        var data = 44
+
+        for (f in 30 .. (buffer.size - 8)) {
+            if (buffer[f].toChar() == 'd' && buffer[f + 1].toChar() == 'a' && buffer[f + 2].toChar() == 't' && buffer[f + 3].toChar() == 'a') {
+                data = f + 8
+                break
+            }
+        }
+
+        return WavProperty(sampleRateString = samplerateString, sampleRate = samplerate, channels = channels, bitWidth = bitwidth, data = data)
     }
 
     //--------------------------------------------------------------------------
     override fun run() {
         var res                         = ""
-        val buffer                      = ByteArray(size = 4096 * 32)
+        val buffer                      = ByteArray(size = 8192)
         var encoderProcess: Process?    = null
         var decoderProcess: Process?    = null
         var outputStream: OutputStream? = null
         var inputStream: InputStream?   = null
-        var firstProp                   = WavProperty("", 0)
+        var firstProp                   = WavProperty(sampleRateString = "", sampleRate = 0, channels = 0, channelString = "", bitWidth = 0, data = 0)
         var encoderParams: MutableList<String>
         var encoderBuilder: ProcessBuilder?
         var decoderBuilder: ProcessBuilder?
 
         try {
-            for (mp3 in parameters.mp3Files) {
-                val decoderParams = mutableListOf<String>("lame", "--quiet", "--decode", mp3.path, "-")
+            var gap: ByteArray? = null
+
+            for (file in parameters.audioFiles) {
+                val decoderParams = if (file.extension.toLowerCase() == "mp3") listOf<String>("lame", "--quiet", "--decode", file.path, "-") else listOf<String>("ffmpeg", "-loglevel", "level+quiet", "-i", file.path, "-f", "wav", "-")
                 var parseHeader   = true
-                var currProp: WavProperty
+                var currProp      = WavProperty(sampleRateString = "", sampleRate = 0, channels = 0, channelString = "", bitWidth = 0, data = 0)
 
                 Swing.logMessage = decoderParams.joinToString(separator = " ")
 
                 decoderBuilder = ProcessBuilder(decoderParams)
                 decoderProcess = decoderBuilder.start()
                 inputStream    = decoderProcess.inputStream
-                message        = "decoding ${mp3.path}"
+                message        = "decoding ${file.path}"
 
                 while (decoderProcess.isAlive == true) {
                     val read = inputStream.read(buffer)
@@ -138,25 +178,35 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.mp3File
                     if (read > 0) {
                         if (encoderProcess == null) {
                             firstProp        = parseWavHeader(buffer, read)
+                            currProp         = firstProp
                             encoderParams    = createEncodeParams(firstProp)
                             Swing.logMessage = encoderParams.joinToString(separator = " ")
                             encoderBuilder   = ProcessBuilder(encoderParams)
                             encoderProcess   = encoderBuilder.start()
                             outputStream     = encoderProcess.outputStream
+
+                            val seconds = parameters.gap.numOrZero.toInt()
+
+                            if (seconds != 0) {
+                                gap = ByteArray(size = (firstProp.sampleRate * firstProp.channels * 2 * seconds))
+                            }
                         }
                         else if (parseHeader == true) {
                             currProp = parseWavHeader(buffer, read)
+                        }
 
-                            if (currProp != firstProp) {
-                                throw Exception("error: channels or samplerate are different for these tracks\n${parameters.mp3Files[0].name} (${firstProp.sampleRate}Khz, ${firstProp.channelString})\n${mp3.name} (${currProp.sampleRate}Khz, ${currProp.channelString})")
-                            }
+                        if (currProp.sampleRate != firstProp.sampleRate || currProp.channels != firstProp.channels || currProp.bitWidth != firstProp.bitWidth) {
+                            throw Exception("error: channels or samplerate or bitwidth are different for these tracks\n${parameters.audioFiles[0].name} (${firstProp.sampleRateString} Khz, ${firstProp.channelString}, ${firstProp.bitWidth} bit)\n${file.name} (${currProp.sampleRateString} Khz, ${currProp.channelString}, ${currProp.bitWidth} bit)")
                         }
 
                         if (parseHeader == true) {
                             parseHeader = false
-                            outputStream?.write(buffer, 44, read)
+
+                            if (read > currProp.data) {
+                                outputStream?.write(buffer, currProp.data, read - currProp.data)
+                            }
                         }
-                        else {
+                        else if (read > 0){
                             outputStream?.write(buffer, 0, read)
                         }
                     }
@@ -166,7 +216,11 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.mp3File
                     }
                 }
 
-                progress += mp3.length()
+                if (gap != null && file != parameters.audioFiles.last()) {
+                    outputStream?.write(gap, 0, gap.size)
+                }
+
+                progress += file.length()
 
                 if (decoderProcess.exitValue() != 0) {
                     throw Exception("")
@@ -198,12 +252,12 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.mp3File
                 encoderProcess.waitFor()
             }
 
-            if (res == "" && decoderProcess != null && decoderProcess.exitValue() != 0) {
-                res = "error: decoder failed"
-            }
-
             if (res == "" && encoderProcess != null && encoderProcess.exitValue() != 0) {
                 res = "error: encoder failed"
+            }
+
+            if (res == "" && decoderProcess != null && decoderProcess.exitValue() != 0) {
+                res = "error: decoder failed"
             }
 
             if (res.isNotEmpty() == true) {

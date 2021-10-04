@@ -45,7 +45,7 @@ data class Widget(val comp: Component, val x: Int, val y: Int, val w: Int, val h
 //------------------------------------------------------------------------------
 
 /**
- * Resize its all child widgets by using a grid.
+ * Resize all child widgets by using a grid.
  */
 class Layout(val size: Int) : LayoutManager {
     private var x = -1
@@ -68,34 +68,34 @@ class Layout(val size: Int) : LayoutManager {
         }
         else {
             for (c in widgets) {
-                var x1 = if (c.x >= 0) {
+                val x1 = if (c.x >= 0) {
                     c.x * size
                 }
                 else {
                     parent.width + c.x * size
                 }
 
-                var y1 = if (c.y >= 0) {
+                val y1 = if (c.y >= 0) {
                     c.y * size
                 }
                 else {
                     parent.height + c.y * size
                 }
 
-                var x2 = when {
+                val x2 = when {
                     c.w == 0 -> parent.width
                     c.w > 0 -> x1 + c.w * size
                     else -> parent.width + c.w * size
                 }
 
-                var y2 = when {
+                val y2 = when {
                     c.h == 0 -> parent.height
                     c.h > 0 -> y1 + c.h * size
                     else -> parent.height + c.h * size
                 }
 
-                var w1 = x2 - x1
-                var h1 = y2 - y1
+                val w1 = x2 - x1
+                val h1 = y2 - y1
                 c.comp.resize(x1, y1, w1, h1)
             }
         }
@@ -110,7 +110,7 @@ class Layout(val size: Int) : LayoutManager {
 }
 
 /**
- * An layout panel that uses a grid to layout its child widgets.
+ * A layout panel that uses a grid to lay out its child widgets.
  */
 open class LayoutPanel(size: Int = Swing.defFont.size) : JPanel() {
     private val layoutManager = Layout(size)
