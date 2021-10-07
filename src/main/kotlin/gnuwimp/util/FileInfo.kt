@@ -302,7 +302,7 @@ class FileInfo(pathname: String) {
          * Return true if java is running in a unix like operating system.
          */
         val isUnix: Boolean
-            get() = System.getProperty("os.name").toLowerCase().contains("windows") == false
+            get() = System.getProperty("os.name").lowercase().contains("windows") == false
 
         //----------------------------------------------------------------------
         private fun extractDate(date: String): String {

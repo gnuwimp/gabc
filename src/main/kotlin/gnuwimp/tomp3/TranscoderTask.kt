@@ -51,40 +51,6 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.audioFi
             list.add(parameters.bitrate)
         }
 
-        list.add("--id3v2-only")
-
-        list.add("--ta")
-        list.add(parameters.author)
-
-        list.add("--tl")
-        list.add(parameters.title)
-
-        list.add("--tt")
-        list.add(parameters.title)
-
-        if (parameters.year != "") {
-            list.add("--ty")
-            list.add(parameters.year)
-        }
-
-        if (parameters.genre.isNotBlank() == true) {
-            list.add("--tg")
-            list.add(parameters.genre)
-        }
-
-        list.add("--tn")
-        list.add("1/1")
-
-        if (parameters.comment.isNotBlank() == true) {
-            list.add("--tc")
-            list.add(parameters.comment)
-        }
-
-        if (parameters.cover.isNotBlank() == true) {
-            list.add("--ti")
-            list.add(parameters.cover)
-        }
-
         list.add("-")
         list.add(parameters.mp3.absolutePath)
 
@@ -97,7 +63,7 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.audioFi
             throw Exception("error: to few bytes to parse the wav header")
         }
 
-        if (buffer[0].toChar() != 'R' || buffer[1].toChar() != 'I' || buffer[2].toChar() != 'F' || buffer[3].toChar() != 'F') {
+        if (buffer[0].toInt().toChar() != 'R' || buffer[1].toInt().toChar() != 'I' || buffer[2].toInt().toChar() != 'F' || buffer[3].toInt().toChar() != 'F') {
             throw Exception("error: this is not wav data")
         }
 
@@ -115,27 +81,27 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.audioFi
 
         val samplerateString = when(samplerate) {
             8000 -> "8"
-            11025 ->  "11.025"
-            12000 ->  "12"
-            22050 ->  "22.050"
-            24000 ->  "24"
-            32000 ->  "32"
-            37800 ->  "37.8"
-            44056 ->  "44.056"
-            44100 ->  "44.1"
-            48000 ->  "48"
-            64000 ->  "64"
-            88200 ->  "88.2"
-            96000 ->  "96"
-            176400 ->  "176.4"
-            192000 ->  "192"
+            11025 -> "11.025"
+            12000 -> "12"
+            22050 -> "22.050"
+            24000 -> "24"
+            32000 -> "32"
+            37800 -> "37.8"
+            44056 -> "44.056"
+            44100 -> "44.1"
+            48000 -> "48"
+            64000 -> "64"
+            88200 -> "88.2"
+            96000 -> "96"
+            176400 -> "176.4"
+            192000 -> "192"
             else -> throw Exception("error: samplerate ($samplerate) is out of range")
         }
 
         var data = 44
 
         for (f in 30 .. (buffer.size - 8)) {
-            if (buffer[f].toChar() == 'd' && buffer[f + 1].toChar() == 'a' && buffer[f + 2].toChar() == 't' && buffer[f + 3].toChar() == 'a') {
+            if (buffer[f].toInt().toChar() == 'd' && buffer[f + 1].toInt().toChar() == 'a' && buffer[f + 2].toInt().toChar() == 't' && buffer[f + 3].toInt().toChar() == 'a') {
                 data = f + 8
                 break
             }
@@ -161,7 +127,7 @@ class TranscoderTask(val parameters: Parameters) : Task(max = parameters.audioFi
             var gap: ByteArray? = null
 
             for (file in parameters.audioFiles) {
-                val decoderParams = if (file.extension.toLowerCase() == "mp3") listOf<String>("lame", "--quiet", "--decode", file.path, "-") else listOf<String>("ffmpeg", "-loglevel", "level+quiet", "-i", file.path, "-f", "wav", "-")
+                val decoderParams = if (file.extension.lowercase() == "mp3") listOf<String>("lame", "--quiet", "--decode", file.path, "-") else listOf<String>("ffmpeg", "-loglevel", "level+quiet", "-i", file.path, "-f", "wav", "-")
                 var parseHeader   = true
                 var currProp      = WavProperty(sampleRateString = "", sampleRate = 0, channels = 0, channelString = "", bitWidth = 0, data = 0)
 

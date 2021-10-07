@@ -11,6 +11,7 @@ import java.awt.Image
 import java.awt.Toolkit
 import javax.swing.JOptionPane
 import javax.swing.SwingUtilities
+import javax.swing.UIManager
 import kotlin.system.exitProcess
 
 //------------------------------------------------------------------------------
@@ -50,10 +51,11 @@ object Main {
     @JvmStatic fun main(args: Array<String>) {
         try {
             SwingUtilities.invokeLater {
+                window.prefLoad()
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
                 window.isVisible = true
-                window.prefLoad(args)
 
-                if (window.auto != 0) {
+                if (window.argLoad(args) == true && window.auto != 0) {
                     window.run()
                 }
             }

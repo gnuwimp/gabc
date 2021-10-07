@@ -32,7 +32,7 @@ And use "" around text and paths with spaces.<br>
 --comment [comment tag]    comment string (optional)
 --year [recording year]    track year (optional, 1 - 2100)
 --genre [genre]            genre string (default Audiobook, optional)
---bitrate [mp3 bitrate]    bitrate for target file (default 48, 24 - 320, optional)
+--bitrate [mp3 bitrate]    bitrate for target file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, optional, default 48)
 --gap [SECONDS]            insert silence between tracks (1 - 5 seconds, optional)
 --mono                     convert stereo to mono (optional)
 --vbr                      use VBR mode (optional)

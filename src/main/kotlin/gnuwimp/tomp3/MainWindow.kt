@@ -7,6 +7,9 @@ package gnuwimp.tomp3
 
 import gnuwimp.swing.*
 import gnuwimp.util.*
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.images.StandardArtwork
 import java.awt.Frame
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
@@ -62,7 +65,7 @@ class MainWindow : JFrame(APP_NAME) {
                 "--comment [comment tag]    comment string (optional)<br>" +
                 "--year [recording year]    track year (optional, 1 - 2100)<br>" +
                 "--genre [genre]            genre string (default Audiobook, optional)<br>" +
-                "--bitrate [mp3 bitrate]    bitrate for target file (default 48, 24 - 320, optional)<br>" +
+                "--bitrate [mp3 bitrate]    bitrate for target file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, optional, default 48)<br>" +
                 "--gap [SECONDS]            insert silence between tracks (1 - 5 seconds, optional)<br>" +
                 "--mono                     convert stereo to mono (optional)<br>" +
                 "--vbr                      use VBR mode (optional)<br>" +
@@ -97,9 +100,9 @@ class MainWindow : JFrame(APP_NAME) {
     private val genreLabel        = JLabel("Genre:")
     private val genreInput        = JTextField()
     private val bitrateLabel      = JLabel("Bitrate:")
-    private val bitrateInput      = JTextField()
+    private val bitrateCombo      = ComboBox<String>(strings = listOf("32", "40", "48", "56", "64", "80", "96", "112", "128", "192", "256", "320"), 2)
     private val gapLabel          = JLabel("Gap:")
-    private val gapInput          = JTextField()
+    private val gapCombo          = ComboBox<String>(strings = listOf("0", "1", "2", "3", "4", "5"), 0)
     private val monoLabel         = JLabel("Mono:")
     private val monoCheck         = JCheckBox()
     private val vbrLabel          = JLabel("VBR:")
@@ -158,19 +161,19 @@ class MainWindow : JFrame(APP_NAME) {
 
         y += 5
         main.add(bitrateLabel, x = 1, y = y, w = w, h = 4)
-        main.add(bitrateInput, x = w + 2, y = y, w = -22, h = 4)
+        main.add(bitrateCombo, x = w + 2, y = y, w = 15, h = 4)
 
         y += 5
         main.add(gapLabel, x = 1, y = y, w = w, h = 4)
-        main.add(gapInput, x = w + 2, y = y, w = -22, h = 4)
+        main.add(gapCombo, x = w + 2, y = y, w = 15, h = 4)
 
         y += 5
         main.add(monoLabel, x = 1, y = y, w = w, h = 4)
-        main.add(monoCheck, x = w + 2, y = y, w = -22, h = 4)
+        main.add(monoCheck, x = w + 2, y = y, w = 15, h = 4)
 
         y += 5
         main.add(vbrLabel, x = 1, y = y, w = w, h = 4)
-        main.add(vbrCheck, x = w + 2, y = y, w = -22, h = 4)
+        main.add(vbrCheck, x = w + 2, y = y, w = 15, h = 4)
 
         pack()
 
@@ -182,8 +185,8 @@ class MainWindow : JFrame(APP_NAME) {
         titleInput.toolTipText    = "Set title/artist name."
         yearInput.toolTipText     = "Set year for the audio book (optional, 1 - 2100)."
         genreInput.toolTipText    = "Set track genre (optional)."
-        bitrateInput.toolTipText  = "Set bitrate for the result file (24 - 320)."
-        gapInput.toolTipText      = "Insert silence between tracks (1 - 5 seconds)."
+        bitrateCombo.toolTipText  = "Set bitrate for the result file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320)."
+        gapCombo.toolTipText      = "Insert silence between tracks (0 - 5 seconds)."
         monoCheck.toolTipText     = "Force mono if input tracks are stereo."
         vbrCheck.toolTipText      = "Use variable bit rate for the result file."
 
@@ -267,99 +270,7 @@ class MainWindow : JFrame(APP_NAME) {
     }
 
     //--------------------------------------------------------------------------
-    fun quit() {
-        prefSave()
-        isVisible = false
-        dispose()
-        exitProcess(status = 0)
-    }
-
-    //--------------------------------------------------------------------------
-    private fun stage1SetParameters(): Parameters {
-        val parameters = Parameters(
-            source  = sourceInput.text,
-            dest    = destInput.text,
-            cover   = imageInput.text,
-            author  = authorInput.text,
-            title   = titleInput.text,
-            year    = yearInput.text,
-            comment = commentInput.text,
-            genre   = genreInput.text,
-            bitrate = bitrateInput.text,
-            gap     = gapInput.text,
-            mono    = monoCheck.isSelected,
-            vbr     = vbrCheck.isSelected
-        )
-
-        parameters.validate()
-        return parameters
-    }
-
-    //--------------------------------------------------------------------------
-    private fun stage2LoadFiles(parameters: Parameters) {
-        val files = File(parameters.source).listFiles()
-
-        if (files != null) {
-            parameters.audioFiles = files.filter { file ->
-                file.isFile && (file.extension.toLowerCase() == "mp3" ||
-                                file.extension.toLowerCase() == "aac" ||
-                                file.extension.toLowerCase() == "flac" ||
-                                file.extension.toLowerCase() == "ogg" ||
-                                file.extension.toLowerCase() == "wav" ||
-                                file.extension.toLowerCase() == "avi" ||
-                                file.extension.toLowerCase() == "mkv" ||
-                                file.extension.toLowerCase() == "mp4")
-            }
-        }
-
-        if (parameters.audioFiles.isEmpty() == true) {
-            throw Exception("error: no audio files in source directory")
-        }
-
-        parameters.audioFiles = parameters.audioFiles.sortedBy { it.path }
-    }
-
-    //--------------------------------------------------------------------------
-    private fun stage3Transcoding(parameters: Parameters) {
-        val tasks    = mutableListOf<Task>(TranscoderTask(parameters = parameters))
-        val progress = TaskManager(tasks = tasks, threadCount = 1, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
-        val dialog   = TaskDialog(taskManager = progress, title = "Converting Files", type = TaskDialog.Type.PERCENT, parent = this)
-
-        dialog.enableCancel = true
-        dialog.start(updateTime = 50L)
-        tasks.throwFirstError()
-    }
-
-    //--------------------------------------------------------------------------
-    fun prefLoad(args: Array<String>) {
-        defaultCloseOperation = DISPOSE_ON_CLOSE
-        fontForAll            = Swing.defFont
-
-        val w  = pref.winWidth
-        val h  = pref.winHeight
-        var x  = pref.winX
-        var y  = pref.winY
-        val sc = Toolkit.getDefaultToolkit().screenSize
-
-        if (x > sc.getWidth() || x < -50) {
-            x = 0
-        }
-
-        if (y > sc.getHeight() || y < -50) {
-            y = 0
-        }
-
-        setLocation(x, y)
-        setSize(w, h)
-
-        if (pref.winMax == true) {
-            extendedState = MAXIMIZED_BOTH
-        }
-
-        destDir   = File(pref.destPath)
-        sourceDir = File(pref.sourcePath)
-        imageDir  = File(pref.imagePath)
-
+    fun argLoad(args: Array<String>): Boolean {
         try {
             val source  = args.findString("--src", "")
             val dest    = args.findString("--dest", "")
@@ -370,8 +281,8 @@ class MainWindow : JFrame(APP_NAME) {
             val comment = args.findString("--comment", "")
             val year    = args.findString("--year", "")
             val genre   = args.findString("--genre", "Audiobook")
-            val bitrate = args.findInt("--bitrate", 48)
-            val gap     = args.findInt("--gap", 0)
+            var bitrate = args.findString("--bitrate", "48")
+            var gap     = args.findString("--gap", "0")
             val mono    = args.find("--mono") != -1
             val vbr     = args.find("--vbr") != -1
 
@@ -417,8 +328,21 @@ class MainWindow : JFrame(APP_NAME) {
                 genreInput.text = genre
             }
 
-            bitrateInput.text = bitrate.toString()
-            gapInput.text = gap.toString()
+            for ((i, b) in bitrateCombo.strings.withIndex()) {
+                if (b == bitrate) {
+                    bitrateCombo.selectedIndex = i
+                    bitrate = ""
+                    break
+                }
+            }
+
+            for ((i, g) in gapCombo.strings.withIndex()) {
+                if (g == gap) {
+                    gapCombo.selectedIndex = i
+                    gap = ""
+                    break
+                }
+            }
 
             if (mono == true) {
                 monoCheck.isSelected = true
@@ -427,9 +351,155 @@ class MainWindow : JFrame(APP_NAME) {
             if (vbr == true) {
                 vbrCheck.isSelected = true
             }
+
+            if (bitrate != "") {
+                throw Exception("error: invalid value for --bitrate ($bitrate)")
+            }
+
+            if (gap != "") {
+                throw Exception("error: invalid value for --gap ($gap)")
+            }
+
+            return true
         }
         catch (e: Exception) {
+            if (auto == 2) {
+                e.printStackTrace()
+                quit()
+            }
+            else {
+                JOptionPane.showMessageDialog(null, e, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE)
+            }
+
+            return false
         }
+    }
+
+    //--------------------------------------------------------------------------
+    fun quit() {
+        prefSave()
+        isVisible = false
+        dispose()
+        exitProcess(status = 0)
+    }
+
+    //--------------------------------------------------------------------------
+    private fun stage1SetParameters(): Parameters {
+        val parameters = Parameters(
+            source  = sourceInput.text,
+            dest    = destInput.text,
+            cover   = imageInput.text,
+            artist  = authorInput.text,
+            title   = titleInput.text,
+            year    = yearInput.text,
+            comment = commentInput.text,
+            genre   = genreInput.text,
+            bitrate = bitrateCombo.text,
+            gap     = gapCombo.text,
+            mono    = monoCheck.isSelected,
+            vbr     = vbrCheck.isSelected
+        )
+
+        parameters.validate()
+        return parameters
+    }
+
+    //--------------------------------------------------------------------------
+    private fun stage2LoadFiles(parameters: Parameters) {
+        val files = File(parameters.source).listFiles()
+
+        if (files != null) {
+            parameters.audioFiles = files.filter { file ->
+                file.isFile && (file.extension.lowercase() == "mp3" ||
+                                file.extension.lowercase() == "aac" ||
+                                file.extension.lowercase() == "flac" ||
+                                file.extension.lowercase() == "ogg" ||
+                                file.extension.lowercase() == "wav" ||
+                                file.extension.lowercase() == "avi" ||
+                                file.extension.lowercase() == "mkv" ||
+                                file.extension.lowercase() == "mp4")
+            }
+        }
+
+        if (parameters.audioFiles.isEmpty() == true) {
+            throw Exception("error: no audio files in source directory")
+        }
+
+        parameters.audioFiles = parameters.audioFiles.sortedBy { it.path }
+    }
+
+    //--------------------------------------------------------------------------
+    private fun stage3Transcoding(parameters: Parameters) {
+        val tasks    = mutableListOf<Task>(TranscoderTask(parameters = parameters))
+        val progress = TaskManager(tasks = tasks, threadCount = 1, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
+        val dialog   = TaskDialog(taskManager = progress, title = "Converting Files", type = TaskDialog.Type.PERCENT, parent = this)
+
+        dialog.enableCancel = true
+        dialog.start(updateTime = 50L)
+        tasks.throwFirstError()
+    }
+
+    //--------------------------------------------------------------------------
+    private fun stage4WriteTags(parameters: Parameters) {
+        try {
+            val track = AudioFileIO.read(parameters.mp3)
+            val tag   = track.tagOrCreateDefault
+
+            tag.setField(FieldKey.ALBUM, parameters.title)
+            tag.setField(FieldKey.ALBUM_ARTIST, parameters.artist)
+            tag.setField(FieldKey.ARTIST, parameters.artist)
+            tag.setField(FieldKey.COMMENT, parameters.comment)
+            tag.setField(FieldKey.ENCODER, "lame")
+            tag.setField(FieldKey.GENRE, parameters.genre)
+            tag.setField(FieldKey.TITLE, parameters.title)
+            tag.setField(FieldKey.TRACK, "1")
+            tag.setField(FieldKey.TRACK_TOTAL, "1")
+
+            if (parameters.year.numOrMinus >= 0) {
+                tag.setField(FieldKey.YEAR, parameters.year)
+            }
+
+            if (parameters.cover.isNotBlank() == true) {
+                tag.addField(StandardArtwork.createArtworkFromFile(File(parameters.cover)))
+            }
+
+            track.tag = tag
+            track.commit()
+        }
+        catch (e: Exception) {
+            throw Exception("error: failed to write tags\n${e.message}")
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    fun prefLoad() {
+        defaultCloseOperation = DISPOSE_ON_CLOSE
+        fontForAll            = Swing.defFont
+
+        val w  = pref.winWidth
+        val h  = pref.winHeight
+        var x  = pref.winX
+        var y  = pref.winY
+        val sc = Toolkit.getDefaultToolkit().screenSize
+
+        if (x > sc.getWidth() || x < -50) {
+            x = 0
+        }
+
+        if (y > sc.getHeight() || y < -50) {
+            y = 0
+        }
+
+        setLocation(x, y)
+        setSize(w, h)
+
+        if (pref.winMax == true) {
+            extendedState = MAXIMIZED_BOTH
+        }
+
+        destDir   = File(pref.destPath)
+        sourceDir = File(pref.sourcePath)
+        imageDir  = File(pref.imagePath)
     }
 
     //--------------------------------------------------------------------------
@@ -456,14 +526,15 @@ class MainWindow : JFrame(APP_NAME) {
             parameters = stage1SetParameters()
             stage2LoadFiles(parameters)
             stage3Transcoding(parameters)
+            stage4WriteTags(parameters)
 
-            Swing.logMessage = "transcoding finished successfully with file ${parameters.mp3.name}"
+            Swing.logMessage = "encoding finished successfully with file '${parameters.mp3.name}'"
 
             if (auto != 0) {
                 quit()
             }
             else {
-                JOptionPane.showMessageDialog(this, "transcoding finished successfully with file ${parameters.mp3.name}", APP_NAME, JOptionPane.INFORMATION_MESSAGE)
+                JOptionPane.showMessageDialog(this, "encoding finished successfully with file '${parameters.mp3.name}'", APP_NAME, JOptionPane.INFORMATION_MESSAGE)
             }
         }
         catch (e: Exception) {
