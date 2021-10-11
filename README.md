@@ -1,50 +1,74 @@
-# toMP3
-toMP3 is an open source audio converter written in [kotlin](https://kotlinlang.org).<br>
-toMP3 converts an directory with audio or video files into one single mp3 file.<br>
-It uses lame for encoding and decoding mp3.<br>
-And ffmpeg for decoding aac/flac/ogg/wav audio files and avi/mkv/mp4 video files.<br>
-All input files must have same samplerate and number of channels (stereo/mono) and bitwidth.<br>
-Beware that all files that are lossy encoded will be lose some audio quality when transcoded.<br>
-toMP3 is released under the [GNU General Public License v3.0](LICENSE).
+# toMP3 is an audio converter
+
+## About
+toMp3 converts an directory with audio or video files into one single mp3/ogg file.  
+The first version was only for mono audio books but it can now work with various formats.  
+It uses lame/oggenc/ffmpeg for all the transcoding.  
+All input files must have same samplerate and number of channels (stereo/mono) and bitwidth.  
+Beware that all files that are lossy encoded will be lose some audio quality when transcoded.
+toMP3 is  written in [kotlin](https://kotlinlang.org) and released under the [GNU General Public License v3.0](LICENSE).  
 
 ## Download
-Download toMP3 [here](https://github.com/gnuwimp/toMP3/releases).
+[Java](https://java.com) is needed to run [toMP3](https://github.com/gnuwimp/toMP3/releases).  
+[Lame](https://lame.sourceforge.io) is used for encoding and decoding mp3 files.  
+And [oggenc](https://www.xiph.org/ogg) for encoding ogg files.  
+To decode aac/flac/wav/ogg/avi/mp4/mkv files [ffmpeg](https://www.ffmpeg.org) must be installed.
 
-You will need [Java](https://java.com) installed to run this program.<br>
-And [lame](https://lame.sourceforge.io) and optional [ffmpeg](https://www.ffmpeg.org).<br>
-It should run on all operating systems that has Java and lame installed.<br>
-Lame and ffmpeg must be in application path.<br>
+## Usage
+Double click toMP3.jar file on windows to start the program.  
+Or run it from the command line with <code>java -jar toMP3.jar</code>.  
+toMP3 has been tested on Windows 10 and Ubuntu 21.04.  
 
-## Run
-Double click toMP3.jar file on windows to start the program.<br>
-Or run it from the command line with <code>java -jar toMP3.jar</code>.<br>
-toMP3 has been tested on Windows 10 and Ubuntu 21.04.<br>
-
-<b>Command Line Arguments</b>.<br>
-It can also use arguments, (use only ascii characters on Windows).<br>
-And use "" around text and paths with spaces.<br>
+## Command Line Arguments  
+It can also use arguments, (use only ascii characters on Windows).  
+And use "" around text and paths with spaces.  
 <pre>
---src  [source]            source directory with audio files
---dest [destination]       destination directory for target file
---cover [filename]         track cover image (optional)
---artist [name]            artist name
---title [name]             album and title name
---comment [comment tag]    comment string (optional)
---year [recording year]    track year (optional, 1 - 2100)
---genre [genre]            genre string (default Audiobook, optional)
---bitrate [mp3 bitrate]    bitrate for target file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, optional, default 48)
---gap [SECONDS]            insert silence between tracks (1 - 5 seconds, optional)
---mono                     convert stereo to mono (optional)
---vbr                      use VBR mode (optional)
---auto                     start automatically and quit after successful encoding
---auto2                    start automatically and quit even for error
+--src  [PATH]              source directory with audio files
+--dest [PATH]              destination directory for target file
+--artist [TEXT]            artist name
+--title [TEXT]             album and title name
+--comment [TEXT]           comment string (optional)
+--cover [PATH]             track cover image (optional)
+--year [YYYY]              track year (optional, 1 - 2100)
+--genre [TEXT]             genre string (optional, default Audiobook)
+--gap [SECONDS]            insert silence between tracks (optional, default 0)
+                             valid values are: 0 - 5
+--mono                     downmix stereo to mono (optional)
+--encoder                  index in encoder list (optional, default 4 -> MP3 CBR 128 Kbps)
+                             0 = MP3 CBR 32 Kbps
+                             1 = MP3 CBR 48 Kbps
+                             2 = MP3 CBR 64 Kbps
+                             3 = MP3 CBR 96 Kbps
+                             4 = MP3 CBR 128 Kbps
+                             5 = MP3 CBR 192 Kbps
+                             6 = MP3 CBR 256 Kbps
+                             7 = MP3 CBR 320 Kbps
+                             8 = MP3 VBR ~160 Kbps
+                             9 = MP3 VBR ~190 Kbps
+                             10 = MP3 VBR ~240 Kbps
+                             11 = Ogg ~45 Kbps
+                             12 = Ogg ~64 Kbps
+                             13 = Ogg ~96 Kbps
+                             14 = Ogg ~128 Kbps
+                             15 = Ogg ~192 Kbps
+                             16 = Ogg ~256 Kbps
+                             17 = Ogg ~320 Kbps
+                             18 = Ogg ~500 Kbps
+--auto                     start automatically and quit after successful encoding (optional)
+--auto2                    start automatically and quit even for error (optional)
 </pre>
 
 ## Screenshots
-<img src="images/tomp3.png" width="50%" height="50%"/>
+<img src="images/tomp3.png"/>
+<img src="images/tomp3-2.png"/>
 
 ## Changes
 <pre>
+2.3:    added jaudiotagger for tag writing
+        added support for ogg encoding
+        ui changes
+        bitrate selection changed
+
 2.2:    renamed from gabc to toMP3
         added support for more input files (aac/flac/ogg/wav/avi/mkv/mp4)
         options for mono/stereo and vbr

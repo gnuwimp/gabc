@@ -61,7 +61,6 @@ object Main {
             }
         }
         catch(e: Exception) {
-            e.printStackTrace()
             JOptionPane.showMessageDialog(null, e, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE)
         }
     }
