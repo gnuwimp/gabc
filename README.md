@@ -1,11 +1,11 @@
-# toMP3 is an audio converter
+# toMP3 is an audio file converter
 
 ## About
 toMp3 converts an directory with audio or video files into one single mp3/ogg file.  
 The first version was only for mono audio books but it can now work with various formats.  
 It uses lame/oggenc/ffmpeg for all the transcoding.  
 All input files must have same samplerate and number of channels (stereo/mono) and bitwidth.  
-Beware that all files that are lossy encoded will be lose some audio quality when transcoded.
+Beware that all files that are lossy encoded will be lose some audio quality when transcoded.  
 toMP3 is  written in [kotlin](https://kotlinlang.org) and released under the [GNU General Public License v3.0](LICENSE).  
 
 ## Download
@@ -34,7 +34,7 @@ And use "" around text and paths with spaces.
 --gap [SECONDS]            insert silence between tracks (optional, default 0)
                              valid values are: 0 - 5
 --mono                     downmix stereo to mono (optional)
---encoder                  index in encoder list (optional, default 4 -> MP3 CBR 128 Kbps)
+--encoder [INDEX]          index in encoder list (optional, default 4 -> MP3 CBR 128 Kbps)
                              0 = MP3 CBR 32 Kbps
                              1 = MP3 CBR 48 Kbps
                              2 = MP3 CBR 64 Kbps

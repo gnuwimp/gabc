@@ -72,7 +72,7 @@ class MainWindow : JFrame(APP_NAME) {
                 "--gap [SECONDS]            insert silence between tracks (optional, default 0)\n" +
                 "                             valid values are: 0 - 5\n" +
                 "--mono                     downmix stereo to mono (optional)\n" +
-                "--encoder                  index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
+                "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
                 "${Encoders.toHelp}" +
                 "--auto                     start automatically and quit after successful encoding (optional)\n" +
                 "--auto2                    start automatically and quit even for error (optional)\n" +
