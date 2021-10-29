@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2021 gnuwimp@gmail.com
+ * Copyright © 2016 - 2021 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -22,22 +22,6 @@ fun Closeable.safeClose(): Boolean {
         false
     }
 }
-
-/**
- * True if file is an audio file
- * Only extension is checked
- */
-val File.isAudio: Boolean
-    get() {
-        val lower = extension.lowercase()
-
-        return if (isFile == false) {
-            false
-        }
-        else {
-            lower == "mp3" || lower == "flac" || lower == "m4a" || lower == "m4b" || lower == "aac" || lower == "ogg" || lower == "wav" || lower == "wma"
-        }
-    }
 
 /**
  * Check if file is an image

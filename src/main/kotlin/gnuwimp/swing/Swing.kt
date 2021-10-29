@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2021 gnuwimp@gmail.com
+ * Copyright © 2016 - 2021 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -68,10 +68,43 @@ class AboutHandler(val appName: String, val aboutText: String) : InvocationHandl
  * Initiate GUI stuff.
  */
 object Swing {
-    private var log: MutableList<String> = mutableListOf()
-    private var startTime: Long = System.currentTimeMillis()
-    var         defFont: Font = Font(Font.SANS_SERIF, Font.PLAIN, 14)
-    var         bigFont: Font = Font(Font.SANS_SERIF, Font.PLAIN, 28)
+    private var messages: MutableList<String> = mutableListOf()
+    private var errors: MutableList<String>   = mutableListOf()
+    private var startTime: Long               = System.currentTimeMillis()
+    var         defFont: Font                 = Font(Font.SANS_SERIF, Font.PLAIN, 14)
+    var         bigFont: Font                 = Font(Font.SANS_SERIF, Font.PLAIN, 28)
+
+    /**
+     * Add or get error message.
+     * Use empty string to clear log.
+     */
+    var errorMessage: String
+        get() {
+            synchronized(errors) {
+                return errors.joinToString("\n")
+            }
+        }
+
+        set(value) {
+            synchronized(errors) {
+                if (value != "") {
+                    errors.add(TimeFormat.LONG_TIME.format(milliSeconds = System.currentTimeMillis() - startTime, timeZone = "UTC") + "| $value")
+                }
+                else {
+                    errors.clear()
+                }
+            }
+        }
+
+    /**
+     * Check if error log has any messages
+     */
+    val hasError: Boolean
+        get() {
+            synchronized(errors) {
+                return errors.size > 0
+            }
+        }
 
     /**
      * Return true if java is running on macOS.
@@ -91,27 +124,28 @@ object Swing {
      */
     var logMessage: String
         get() {
-            synchronized(log) {
-                return log.joinToString("\n")
+            synchronized(messages) {
+                return messages.joinToString("\n")
             }
         }
 
         set(value) {
-            synchronized(log) {
-                if (value.isNotEmpty() == true) {
-                    log.add(TimeFormat.LONG_TIME.format(milliSeconds = System.currentTimeMillis() - startTime, timeZone = "UTC") + "| $value")
+            synchronized(messages) {
+                if (value != "") {
+                    messages.add(TimeFormat.LONG_TIME.format(milliSeconds = System.currentTimeMillis() - startTime, timeZone = "UTC") + "| $value")
                 }
                 else {
-                    log.clear()
+                    messages.clear()
                 }
             }
         }
 
     /**
      * Run first in main method to change look and feel.
+     * Valid themes strings are "native" and "nimbus"
      * Setup macOS stuff.
      */
-    fun setup(nativeLook: Boolean = false, appName: String = "", aboutText: String = "", quitLambda: () -> Unit = {}) {
+    fun setup(theme: String = "", appName: String = "", aboutText: String = "", quitLambda: () -> Unit = {}) {
         try {
             if (isMac == true) {
                 System.setProperty("com.apple.mrj.application.apple.menu.about.name", appName)
@@ -139,11 +173,16 @@ object Swing {
         }
 
         try {
-            if (nativeLook == true) {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-            }
-            else {
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName())
+            when (theme) {
+                "native" -> {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+                }
+                "nimbus" -> {
+                    UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
+                }
+                else -> {
+                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName())
+                }
             }
         }
         catch (e: Exception) {
