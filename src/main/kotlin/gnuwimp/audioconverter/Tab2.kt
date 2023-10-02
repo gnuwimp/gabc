@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 gnuwimp@gmail.com
+ Copyright 2021 - 2023 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -13,9 +13,9 @@ import javax.swing.*
 //------------------------------------------------------------------------------
 @Suppress("UNUSED_VALUE")
 class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
-    private val startLabel    = JLabel("Source:")
-    private val startInput    = JTextField()
-    private val startButton   = JButton("Browse")
+    private val sourceLabel   = JLabel("Source:")
+    private val sourceInput   = JTextField()
+    private val sourceButton  = JButton("Browse")
     private val destLabel     = JLabel("Destination:")
     private val destInput     = JTextField()
     private val destButton    = JButton("Browse")
@@ -32,9 +32,9 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         val w = 16
         var y = 1
 
-        add(startLabel, x = 1, y = y, w = w, h = 4)
-        add(startInput, x = w + 2, y = y, w = -22, h = 4)
-        add(startButton, x = -20, y = y, w = -1, h = 4)
+        add(sourceLabel, x = 1, y = y, w = w, h = 4)
+        add(sourceInput, x = w + 2, y = y, w = -22, h = 4)
+        add(sourceButton, x = -20, y = y, w = -1, h = 4)
 
         y += 5
         add(destLabel, x = 1, y = y, w = w, h = 4)
@@ -51,12 +51,12 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         add(threadsCombo, x = w + 2, y = y, w = 30, h = 4)
         add(convertButton, x = -20, y = y, w = -1, h = 4)
 
-        startInput.toolTipText    = Constants.TAB2_STARTINPUT_TOOLTIP
+        sourceInput.toolTipText    = Constants.TAB2_STARTINPUT_TOOLTIP
         destInput.toolTipText     = Constants.TAB2_DESTINPUT_TOOLTIP
         encoderCombo.toolTipText  = Constants.ENCODERCOMBO_TOOLTIP
         threadsCombo.toolTipText  = Constants.TAB2_THREADS_TOOLTIP
 
-        startButton.toolTipText   = Constants.TAB2_STARTINPUT_TOOLTIP
+        sourceButton.toolTipText   = Constants.TAB2_STARTINPUT_TOOLTIP
         destButton.toolTipText    = Constants.TAB2_DESTINPUT_TOOLTIP
         convertButton.toolTipText = Constants.CONVERTBUTTON_TOOLTIP
 
@@ -67,14 +67,14 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
         //----------------------------------------------------------------------
         destButton.addActionListener {
-            val dialog = JFileChooser(Main.pref.destPath2File)
+            val dialog = JFileChooser(Main.pref.getFile(destInput.text, Main.pref.tab2DestFile))
 
             dialog.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
             dialog.fontForAll        = Swing.defFont
 
-            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory) {
-                destInput.text      = dialog.selectedFile.canonicalPath
-                Main.pref.destPath2 = dialog.selectedFile.canonicalPath
+            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory == true) {
+                destInput.text         = dialog.selectedFile.canonicalPath
+                Main.pref.tab2DestPath = dialog.selectedFile.canonicalPath
             }
         }
 
@@ -84,15 +84,15 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         }
 
         //----------------------------------------------------------------------
-        startButton.addActionListener {
-            val dialog = JFileChooser(Main.pref.startPathFile)
+        sourceButton.addActionListener {
+            val dialog = JFileChooser(Main.pref.getFile(sourceInput.text, Main.pref.tab2SourceFile))
 
             dialog.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
             dialog.fontForAll        = Swing.defFont
 
-            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory) {
-                startInput.text     = dialog.selectedFile.canonicalPath
-                Main.pref.startPath = dialog.selectedFile.canonicalPath
+            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory == true) {
+                sourceInput.text         = dialog.selectedFile.canonicalPath
+                Main.pref.tab2SourcePath = dialog.selectedFile.canonicalPath
             }
         }
     }
@@ -114,7 +114,7 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
             }
 
             if (start != "") {
-                startInput.text = start
+                sourceInput.text = start
             }
 
             if (dest != "") {
@@ -153,7 +153,7 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     //--------------------------------------------------------------------------
     private fun stage1SetParameters() : Tab2Parameters {
         val parameters = Tab2Parameters(
-            source   = startInput.text,
+            source   = sourceInput.text,
             dest    = destInput.text,
             encoder = Encoders.toEncoder(encoderCombo.selectedIndex),
             threads = threadsCombo.text.toInt(),

@@ -15,6 +15,7 @@ class WavHeader {
     }
 
     val sampleRateString: String
+    val sampleRateString2: String
     val sampleRate: Int
     val channels: Short
     val channelString: String
@@ -25,6 +26,7 @@ class WavHeader {
     constructor() {
         sampleRate = 0
         sampleRateString = ""
+        sampleRateString2 = ""
         channels = 0
         channelString = ""
         bitWidth = 0
@@ -73,6 +75,25 @@ class WavHeader {
             176400 -> "176.4"
             192000 -> "192"
             else -> throw Exception("error: samplerate ($sampleRate) is out of range")
+        }
+
+        sampleRateString2 = when(sampleRate) {
+            8000 -> "8000"
+            11025 -> "11025"
+            12000 -> "12000"
+            16000 -> "16000"
+            22050 -> "22050"
+            24000 -> "24000"
+            32000 -> "32000"
+            37800 -> "37800"
+            44056 -> "44056"
+            44100 -> "44100"
+            48000 -> "48000"
+            64000 -> "64000"
+            88200 -> "88200"
+            96000 -> "96000"
+            176400 -> "176400"
+            else -> "192000"
         }
 
         var dataPos = 44

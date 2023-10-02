@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 gnuwimp@gmail.com
+ Copyright 2021 - 2023 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -28,7 +28,7 @@ class Tab2Task(private val inputFile: FileInfo, private val outputFile: FileInfo
         var exception                       = ""
 
         try {
-            val decoderParams = Decoder.create(inputFile)
+            val decoderParams = Decoder.create(inputFile, false)
             val buffer        = ByteArray(size = 131_072)
 
             decoderBuilder    = ProcessBuilder(decoderParams)
@@ -118,6 +118,7 @@ class Tab2Task(private val inputFile: FileInfo, private val outputFile: FileInfo
                         toTag.copyField(FieldKey.TRACK, fromTag)
                         toTag.copyField(FieldKey.TRACK_TOTAL, fromTag)
                         toTag.copyField(FieldKey.YEAR, fromTag)
+                        toTag.setField(FieldKey.ENCODER, parameters.encoder.encoderExe)
                         toTag.copyArtwork(fromTag)
 
                         toFile.tag = toTag

@@ -16,9 +16,10 @@ And it will also try to read and copy tags from the source files.
 ## Download
 Download AudioConverter from [here](https://github.com/gnuwimp/AudioConverter/releases).  
 [Java](https://java.com) is needed.  
-[Lame](https://lame.sourceforge.io) is used for encoding and decoding mp3 files.  
+[Lame](https://lame.sourceforge.io) to encode mp3 files.  
 Install [oggenc](https://www.xiph.org/ogg) to encode ogg files.  
-Install [ffmpeg](https://www.ffmpeg.org) to decode flac/wav/ogg/m4a/avi/mp4/mkv files .
+Install [qaac64] (https://github.com/nu774/qaac/releases) to encode aac files (Windows/iTunes only).
+Install [ffmpeg](https://www.ffmpeg.org) to decode flac/wav/ogg/m4a/avi/mp4/mkv files.
 
 ## Usage
 Double-click AudioConverter.jar file on windows to start the program.  
@@ -64,6 +65,13 @@ And use "" around text and paths with spaces.
                              16 = Ogg ~256 Kbps
                              17 = Ogg ~320 Kbps
                              18 = Ogg ~500 Kbps
+                             19 = AAC HE/CBR 48 Kbps
+                             20 = AAC HE/CBR 80 Kbps
+                             21 = AAC CVBR ~96 Kbps
+                             22 = AAC TVBR63 ~128 Kbps
+                             23 = AAC TVBR109 ~256 Kbps
+                             24 = AAC TVBR127 ~320 Kbps
+                             25 = AAC ALAC
 --auto                     start automatically and quit after successful encoding (optional)
 --auto2                    start automatically and quit even for error (optional)
 </pre>
@@ -82,6 +90,10 @@ To convert file to file use these arguments:
 
 ## Changes
 <pre>
+2.5:    added aac encoding (Windows only, requires iTunes + qaac64)
+        minor improvements
+        added Jaudiotagger library to the source tree
+
 2.4:    renamed again from toMP3 to AudioConverter
         added support for file to file conversion
         ui changes

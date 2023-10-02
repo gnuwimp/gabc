@@ -8,60 +8,79 @@ package gnuwimp.audioconverter
 import java.io.File
 import java.util.prefs.Preferences
 
+//--------------------------------------------------------------------------
+fun Preferences.getFile(entry: String, def: File): File {
+    val file = File(entry)
+
+    if (file.isDirectory == true) {
+        return file
+    }
+
+    return def
+}
+
 //------------------------------------------------------------------------------
-var Preferences.destPath: String
-    get() = get("path_dest", File(System.getProperty("user.home")).canonicalPath)
+val Preferences.tab1DestFile: File
+    get() = File(tab1DestPath)
+
+//------------------------------------------------------------------------------
+var Preferences.tab1DestPath: String
+    get() = get("tab1_dest", File(System.getProperty("user.home")).canonicalPath)
 
     set(value) {
-        put("path_dest", value)
+        put("tab1_dest", value)
     }
 
 //------------------------------------------------------------------------------
-val Preferences.destPathFile: File
-    get() = File(destPath)
+val Preferences.tab1ImageFile: File
+    get() = File(tab1ImagePath)
 
 //------------------------------------------------------------------------------
-var Preferences.destPath2: String
-    get() = get("path_dest2", File(System.getProperty("user.home")).canonicalPath)
+var Preferences.tab1ImagePath: String
+    get() = get("tab1_image", File(System.getProperty("user.home")).canonicalPath)
 
     set(value) {
-        put("path_dest2", value)
+        val f = File(value)
+
+        if (f.isFile == true) {
+            put("tab1_image", f.parentFile.canonicalPath)
+        }
     }
 
 //------------------------------------------------------------------------------
-val Preferences.destPath2File: File
-    get() = File(destPath2)
+val Preferences.tab1SourceFile: File
+    get() = File(tab1SourcePath)
 
 //------------------------------------------------------------------------------
-var Preferences.imagePath: String
-    get() = get("path_pic", File(System.getProperty("user.home")).canonicalPath)
+var Preferences.tab1SourcePath: String
+    get() = get("tab1_source", File(System.getProperty("user.home")).canonicalPath)
 
     set(value) {
-        put("path_pic", value)
+        put("tab1_source", value)
     }
 
 //------------------------------------------------------------------------------
-var Preferences.sourcePath: String
-    get() = get("path_source", File(System.getProperty("user.home")).canonicalPath)
+val Preferences.tab2DestFile: File
+    get() = File(tab2DestPath)
+
+//------------------------------------------------------------------------------
+var Preferences.tab2DestPath: String
+    get() = get("tab2_dest", File(System.getProperty("user.home")).canonicalPath)
 
     set(value) {
-        put("path_source", value)
+        put("tab2_dest", value)
     }
 
 //------------------------------------------------------------------------------
-val Preferences.sourcePathFile: File
-    get() = File(sourcePath)
+val Preferences.tab2SourceFile: File
+    get() = File(tab2SourcePath)
 
 //------------------------------------------------------------------------------
-val Preferences.startPathFile: File
-    get() = File(startPath)
-
-//------------------------------------------------------------------------------
-var Preferences.startPath: String
-    get() = get("path_start", File(System.getProperty("user.home")).canonicalPath)
+var Preferences.tab2SourcePath: String
+    get() = get("tab2_source", File(System.getProperty("user.home")).canonicalPath)
 
     set(value) {
-        put("path_start", value)
+        put("tab2_source", value)
     }
 
 //------------------------------------------------------------------------------

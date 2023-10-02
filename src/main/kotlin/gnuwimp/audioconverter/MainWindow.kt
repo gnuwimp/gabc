@@ -54,7 +54,7 @@ class MainWindow : JFrame(Constants.APP_NAME) {
 
         //----------------------------------------------------------------------
         aboutButton.addActionListener {
-            AboutHandler(appName = Constants.ABOUT_APP, aboutText = Constants.ABOUT_TEXT).show(parent = Main.window)
+            AboutHandler(appName = Constants.ABOUT_APP, aboutText = Constants.aboutApp()).show(parent = Main.window)
         }
 
         //----------------------------------------------------------------------

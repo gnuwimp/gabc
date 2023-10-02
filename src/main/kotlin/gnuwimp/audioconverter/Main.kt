@@ -23,7 +23,7 @@ object Main {
 
     init {
         try {
-            Swing.setup(theme = "nimbus", appName = Constants.ABOUT_APP, aboutText = Constants.ABOUT_TEXT, quitLambda = { quit() })
+            Swing.setup(theme = "nimbus", appName = Constants.ABOUT_APP, aboutText = Constants.aboutApp(), quitLambda = { quit() })
 
             icon          = "gnuwimp/audioconverter/AudioConverter.png".loadImageFromResource()
             Swing.bigFont = Font(Font.SANS_SERIF, Font.PLAIN, 24)
