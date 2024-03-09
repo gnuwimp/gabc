@@ -18,8 +18,8 @@ import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 /**
- * An file information object.
- * Create an object with filename and it will load all stat from the file.
+ * A file information object.
+ * Create an object with filename, and it will load all stat from the file.
  */
 class FileInfo(pathname: String) {
     /**
@@ -37,8 +37,8 @@ class FileInfo(pathname: String) {
      */
     enum class Type {
         MISSING,  /** Missing file or invalid link */
-        FILE,     /** File (can be an link) */
-        DIR,      /** Directory (can be an link) */
+        FILE,     /** File (can be a link) */
+        DIR,      /** Directory (can be a link) */
         OTHER,    /** Something else (only on unix) */
     }
 
@@ -100,7 +100,7 @@ class FileInfo(pathname: String) {
 
                     if (isUnix == false && isLink == false) {
                         isLink = try {
-                            val attr2 = Files.readAttributes(tmp, BasicFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
+                            val attr2 = Files.readAttributes(tmp, DosFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
                             attr2.isDirectory == true && attr2.isOther == true
                         }
                         catch (e: Exception) {
@@ -163,7 +163,7 @@ class FileInfo(pathname: String) {
     val file: File = File(filename)
 
     /**
-     * Is this an directory (can be an link).
+     * Is this a circular directory link?
      */
     val isCircular: Boolean
         get() {
@@ -172,17 +172,18 @@ class FileInfo(pathname: String) {
         }
 
     /**
-     * Is this an directory (can be an link).
+     * Is this a directory (can be a link)?
      */
     val isDir: Boolean = type == Type.DIR
 
     /**
-     *  Is this an regular file (can be an link).
+     *  Is this a regular file (can be a link)?
      */
     val isFile: Boolean = type == Type.FILE
 
     /**
-     * Is file missing, can be an invalid link if file has been created by readDir.
+     * Is file missing?.
+     * Can be an invalid link if file has been created by readDir.
      */
     val isMissing: Boolean = type == Type.MISSING
 
@@ -266,8 +267,8 @@ class FileInfo(pathname: String) {
 
     companion object {
         /**
-         * Return true path is case sensitive.
-         * It has to write to an file to test it
+         * Return true path if case-sensitive.
+         * It has to write to a file to test it
          */
         fun isCaseSensitive(path: String): Boolean {
             var res   = false
@@ -286,24 +287,24 @@ class FileInfo(pathname: String) {
                 }
                 catch (e: Exception) {
                 }
-
-                return res
             }
+
+            return res
         }
 
         /**
-         * Return true path is case sensitive (Not reliable).
+         * Return true path if case-sensitive (Not reliable).
          */
         val isCaseSensitive: Boolean
             get() = File("a") != File("A")
 
         /**
-         * Return true if java is running in an unix like operating system.
+         * Return true if java is running in a unix like operating system.
          */
         val isUnix: Boolean
             get() = System.getProperty("os.name").toLowerCase().contains("windows") == false
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         private fun extractDate(date: String): String {
             var res = ""
 
@@ -363,7 +364,7 @@ class FileInfo(pathname: String) {
             }
         }
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         private fun readDir(files: MutableList<FileInfo>, path: Path, option: ReadDirOption) {
             val visitor  = FileVisitor(path, files, option)
             val set      = mutableSetOf<FileVisitOption>()
@@ -376,9 +377,9 @@ class FileInfo(pathname: String) {
             Files.walkFileTree(path, set, maxDepth, visitor)
         }
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         private fun readDirAddFile(files: MutableList<FileInfo>, file: Path?, option: ReadDirOption): FileInfo? {
-            if (file != null) {
+            return if (file != null) {
                 val fi = FileInfo(file.toString())
 
                 if ((fi.isFile == true || fi.isMissing == true) && option == ReadDirOption.FILES_ONLY_IN_START_DIRECTORY) {
@@ -388,10 +389,10 @@ class FileInfo(pathname: String) {
                     files.add(fi)
                 }
 
-                return fi
+                fi
             }
             else {
-                return null
+                null
             }
         }
     }

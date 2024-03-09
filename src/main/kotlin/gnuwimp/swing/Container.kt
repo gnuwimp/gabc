@@ -11,14 +11,22 @@ import java.awt.Font
 /**
  * Set font for container and all its children recursive.
  */
-fun Container.setFontForAll(font: Font) {
-    this.font = font
+var Container.fontForAll: Font
+    //--------------------------------------------------------------------------
+    get() {
+        return this.font
+    }
 
-    this.components.forEach {
-        it?.font = font
+    //--------------------------------------------------------------------------
+    set(value) {
+        this.font = value
 
-        if (it is Container) {
-            it.setFontForAll(font)
+        this.components.forEach { component ->
+            component?.font = value
+
+            if (component is Container) {
+                component.fontForAll = value
+            }
         }
     }
-}
+
