@@ -18,9 +18,9 @@ And lame must be in application path.<br />
 gABC is released under the [GNU General Public License v3.0](LICENSE).<br />
 
 ## Download
-Download from [here](https://github.com/gnuwimp/gabc/releases)<br />
+Download from [here](https://github.com/gnuwimp/gabc/releases).<br />
 Double click to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".<br />
-You can also set the input fields from the command line (<code>"java -jar c:\bin\gabc.jar D:\book\book1 D:\book D:\book\book1\cover.jpg "Book One" "Best Of Book" "Read by gnu" 1666 3"</code>)<br />
+You can also set the input fields from the command line "<code>java -jar c:\bin\gabc.jar D:\book\book1 D:\book D:\book\book1\cover.jpg "Book One" "Best Of Book" "Read by gnu" 1666 3</code>"<br />
 Download lame for windows at [rarewares](https://www.rarewares.org/mp3-lame-bundle.php).<br />
 
 <hr>
