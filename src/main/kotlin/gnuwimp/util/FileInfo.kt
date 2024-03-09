@@ -218,6 +218,7 @@ class FileInfo(pathname: String) {
      */
     fun readDir(option: ReadDirOption = ReadDirOption.ALL_IN_START_DIRECTORY): List<FileInfo> {
         val path = filepath
+
         return if (path != null) {
             val list = mutableListOf<FileInfo>()
             readDir(list, path, option)
@@ -303,6 +304,25 @@ class FileInfo(pathname: String) {
          */
         val isUnix: Boolean
             get() = System.getProperty("os.name").lowercase().contains("windows") == false
+
+        /**
+         * Return true if java is running in a unix like operating system.
+         */
+        fun safeName(name: String): String {
+            var res = name.replace("/", "")
+            res = res.replace("\"", "")
+            res = res.replace("<", "")
+            res = res.replace(">", "")
+            res = res.replace(":", "")
+            res = res.replace("\\", "")
+            res = res.replace("|", "")
+            res = res.replace("?", "")
+            res = res.replace("*", "")
+            res = res.replace("\t", "")
+            res = res.replace("\n", "")
+            res = res.replace("\r", "")
+            return res
+        }
 
         //----------------------------------------------------------------------
         private fun extractDate(date: String): String {

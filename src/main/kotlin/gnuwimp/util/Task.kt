@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2021 gnuwimp@gmail.com
+ * Copyright © 2016 - 2021 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -18,9 +18,10 @@ class TaskThread(val task: Task) : Thread() {
             task.status = Task.Status.RUNNING
             task.run()
             task.status = Task.Status.OK
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             task.status = Task.Status.ERROR
-            task.error = e.message ?: "Exception"
+            task.error = e.message.toString()
         }
     }
 }
@@ -35,6 +36,8 @@ class TaskThread(val task: Task) : Thread() {
  * Max valuse has to be larger than 0
  */
 abstract class Task(val max: Long = 100) {
+    private var messageString = ""
+
     /**
      * Execution flags for Task object
      */
@@ -54,8 +57,14 @@ abstract class Task(val max: Long = 100) {
     var error = ""
         internal set
 
-    var message = ""
-        internal set
+    var message: String
+        @Synchronized get() {
+            return messageString
+        }
+
+        @Synchronized set(value) {
+            messageString = value
+        }
 
     var progress = 0L
         internal set
@@ -139,7 +148,7 @@ fun List<Task>.throwFirstError() {
  * It uses Task objects to calculate progress values and execute task(s) in thread(s).
  * Thread count can't be more than task count.
  */
-class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onError: Execution = Execution.CONTINUE, val onCancel: Execution = Execution.STOP_JOIN) {
+open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onError: Execution = Execution.CONTINUE, val onCancel: Execution = Execution.STOP_JOIN) {
     /**
      * Flags for Progress actions when running threads
      */
@@ -176,30 +185,35 @@ class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onError: 
     }
 
     /**
-     * Get messages as a list from running tasks
+     * Get messages from tasks.
      */
-    fun messages(messageCount: Int = 4): List<String> {
-        require(messageCount > 0)
+    open fun message(threadCount: Int = 4): String {
+        require(threadCount > 0)
 
-        val list = mutableListOf<String>()
+        var res = ""
+        var max = 0
 
         threadList.forEach { thread ->
             thread?.let {
                 if (thread.state != Thread.State.TERMINATED) {
-                    try {
-                        list.add(thread.task.message)
+                    res += try {
+                        thread.task.message
                     }
-                    catch(e: Exception) {
-                        list.add(e.message ?: "")
+                    catch (e: Exception) {
+                        e.message
                     }
 
-                    if (list.size == messageCount)
-                        return list
+                    res += "\n"
+                    max++
+
+                    if (max == threadCount) {
+                        return res
+                    }
                 }
             }
         }
 
-        return list
+        return res
     }
 
     /**

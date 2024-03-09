@@ -1,9 +1,14 @@
-package gnuwimp.tomp3
+/*
+ * Copyright © 2016 - 2021 gnuwimp@gmail.com
+ * Released under the GNU General Public License v3.0
+ */
+
+package gnuwimp.audioconverter
 
 import gnuwimp.util.getIntAt
 
 //------------------------------------------------------------------------------
-class Wav {
+class WavHeader {
     companion object {
         const val MONO   = 1.toShort()
         const val STEREO = 2.toShort()
@@ -54,6 +59,7 @@ class Wav {
             8000 -> "8"
             11025 -> "11.025"
             12000 -> "12"
+            16000 -> "16"
             22050 -> "22.050"
             24000 -> "24"
             32000 -> "32"

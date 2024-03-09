@@ -1,7 +1,14 @@
-package gnuwimp.tomp3
+/*
+ * Copyright © 2021 gnuwimp@gmail.com
+ * Released under the GNU General Public License v3.0
+ */
+
+package gnuwimp.audioconverter
+
+import gnuwimp.util.FileInfo
 
 //------------------------------------------------------------------------------
-enum class Encoders {
+enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg params: String) {
     MP3_CBR_32(0, "MP3 CBR 32 Kbps", "mp3", "lame", "-b", "32", "--cbr"),
     MP3_CBR_48(1, "MP3 CBR 48 Kbps", "mp3", "lame", "-b", "48", "--cbr"),
     MP3_CBR_64(2, "MP3 CBR 64 Kbps", "mp3", "lame", "-b", "64", "--cbr"),
@@ -24,18 +31,13 @@ enum class Encoders {
     OGG_320(17, "Ogg ~320 Kbps", "ogg", "oggenc", "-q9"),
     OGG_500(18, "Ogg ~500 Kbps", "ogg", "oggenc", "-q10");
 
-    var encoderIndex = 0
-    var encoderName  = ""
-    var encoderExe   = ""
+    var encoderIndex = index
+    var encoderName  = name
+    var encoderExe   = exe
     val encoderArg   = mutableListOf<String>()
-    var fileExt      = ""
+    var fileExt      = ext
 
-    constructor(index: Int, name: String, ext: String, exe: String, vararg params: String) {
-        encoderIndex = index
-        encoderName  = name
-        fileExt      = ext
-        encoderExe   = exe
-
+    init {
         params.forEach {
             encoderArg.add(it)
         }
@@ -45,27 +47,37 @@ enum class Encoders {
         val DEFAULT = MP3_CBR_128
 
         //--------------------------------------------------------------------------
-        fun createEncoder(par: Parameters, wav: Wav): List<String> {
+        fun createEncoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
             return if (par.encoder.fileExt == "mp3") {
-                createMP3Encoder(par, wav)
+                createMP3Encoder(par, wavHeader)
             }
             else {
-                createOggEncoder(par, wav)
+                createOggEncoder(par, wavHeader)
             }
         }
 
         //--------------------------------------------------------------------------
-        private fun createMP3Encoder(par: Parameters, wav: Wav): List<String> {
+        fun createEncoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
+            return if (par.encoder.fileExt == "mp3") {
+                createMP3Encoder(par, wavHeader, file)
+            }
+            else {
+                createOggEncoder(par, wavHeader, file)
+            }
+        }
+
+        //--------------------------------------------------------------------------
+        private fun createMP3Encoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
             val list = mutableListOf<String>()
 
             list.add("lame")
             list.add("--quiet")
 
-            if (wav.channels == Wav.MONO) {
+            if (wavHeader.channels == WavHeader.MONO) {
                 list.add("-m")
                 list.add("m")
             }
-            else if (par.mono == true && wav.channels == Wav.STEREO) {
+            else if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
                 list.add("-m")
                 list.add("m")
                 list.add("-a")
@@ -73,10 +85,10 @@ enum class Encoders {
 
             list.add("-r")
             list.add("-s")
-            list.add(wav.sampleRateString)
+            list.add(wavHeader.sampleRateString)
 
             list.add("--bitwidth")
-            list.add("${wav.bitWidth}")
+            list.add("${wavHeader.bitWidth}")
 
             par.encoder.encoderArg.forEach {
                 list.add(it)
@@ -89,7 +101,36 @@ enum class Encoders {
         }
 
         //--------------------------------------------------------------------------
-        private fun createOggEncoder(par: Parameters, wav: Wav): List<String> {
+        private fun createMP3Encoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
+            val list = mutableListOf<String>()
+
+            list.add("lame")
+            list.add("--quiet")
+
+            if (wavHeader.channels == WavHeader.MONO) {
+                list.add("-m")
+                list.add("m")
+            }
+
+            list.add("-r")
+            list.add("-s")
+            list.add(wavHeader.sampleRateString)
+
+            list.add("--bitwidth")
+            list.add("${wavHeader.bitWidth}")
+
+            par.encoder.encoderArg.forEach {
+                list.add(it)
+            }
+
+            list.add("-")
+            list.add(file.canonicalPath)
+
+            return list
+        }
+
+        //--------------------------------------------------------------------------
+        private fun createOggEncoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
             val list = mutableListOf<String>()
 
             list.add("oggenc")
@@ -98,24 +139,53 @@ enum class Encoders {
             list.add("-r")
 
             list.add("-B")
-            list.add("${wav.bitWidth}")
+            list.add("${wavHeader.bitWidth}")
 
             list.add("-C")
-            list.add("${wav.channels}")
+            list.add("${wavHeader.channels}")
 
             list.add("-R")
-            list.add("${wav.sampleRate}")
+            list.add("${wavHeader.sampleRate}")
 
             par.encoder.encoderArg.forEach {
                 list.add(it)
             }
 
-            if (par.mono == true && wav.channels == Wav.STEREO) {
+            if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
                 list.add("--downmix")
             }
 
             list.add("-o")
             list.add(par.outputFile.absolutePath)
+            list.add("-")
+
+            return list
+        }
+
+        //--------------------------------------------------------------------------
+        private fun createOggEncoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
+            val list = mutableListOf<String>()
+
+            list.add("oggenc")
+            list.add("--quiet")
+
+            list.add("-r")
+
+            list.add("-B")
+            list.add("${wavHeader.bitWidth}")
+
+            list.add("-C")
+            list.add("${wavHeader.channels}")
+
+            list.add("-R")
+            list.add("${wavHeader.sampleRate}")
+
+            par.encoder.encoderArg.forEach {
+                list.add(it)
+            }
+
+            list.add("-o")
+            list.add(file.canonicalPath)
             list.add("-")
 
             return list

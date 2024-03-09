@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2021 gnuwimp@gmail.com
+ * Copyright © 2016 - 2021 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -19,12 +19,15 @@ import kotlin.concurrent.timer
  * A dialog window that runs a TaskManager object.
  * Cancel button is disabled by default.
  */
-class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, parent: JFrame? = null, title: String = "Working...", modal: Boolean = true, width: Int = Swing.defFont.size * 60, height: Int = Swing.defFont.size * 16) : BaseDialog(parent, title, modal) {
+class TaskDialog(val taskManager: TaskManager, val type: Type, parent: JFrame? = null, title: String = "Working...", modal: Boolean = true, width: Int = Swing.defFont.size * 60, height: Int = Swing.defFont.size * 16) : BaseDialog(parent, title, modal) {
     enum class Type {
-        MESSAGE,   /** Show only messages */
-        PERCENT,   /** Show messages and a prercent progress bar */
-        PROGRESS,  /** Show messages and the progress counter label */
-        TIME,      /** Show messages and running time */
+        MESSAGE_ONLY,  /** Show only messages */
+        PERCENT,       /** Show messages and a prercent progress bar */
+        PERCENT_ONLY,  /** Show only progress bar */
+        PROGRESS,      /** Show messages and the progress counter label */
+        PROGRESS_ONLY, /** Show messages and the progress counter label */
+        TIME,          /** Show messages and running time */
+        TIME_ONLY,     /** Show only running time */
     }
 
     private var cancel        = false
@@ -47,10 +50,13 @@ class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, pa
         }
 
     init {
-        val panel = LayoutPanel(size = Swing.defFont.size / 2)
+        val panel   = LayoutPanel(size = Swing.defFont.size / 2)
+        var height2 = height
+        var width2  = width
 
         progressLabel.horizontalAlignment = JLabel.CENTER
         progressLabel.verticalAlignment   = JLabel.TOP
+        progressLabel.lineGrayBorder      = true
         progressBar.isStringPainted       = true
         messageLabel.lineGrayBorder       = true
         messageLabel.verticalAlignment    = JLabel.TOP
@@ -60,7 +66,7 @@ class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, pa
         add(panel)
 
         when (type) {
-            Type.MESSAGE -> {
+            Type.MESSAGE_ONLY -> {
                 progressBar.isVisible = false
                 progressLabel.isVisible = false
                 panel.add(messageLabel,  x =   1,  y =  1,  w = -1,  h = -6)
@@ -78,12 +84,36 @@ class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, pa
                 panel.add(messageLabel,  x =   1,  y =  8,  w = -1,  h = -6)
                 panel.add(cancelButton,  x = -21,  y = -5,  w = 20,  h =  4)
             }
+            Type.PERCENT_ONLY -> {
+                height2 = Swing.defFont.size * 9
+                width2 = Swing.defFont.size * 40
+                progressLabel.isVisible = false
+                messageLabel.isVisible = false
+                panel.add(progressBar,   x =   1,  y =  1,  w = -1,  h =  5)
+                panel.add(cancelButton,  x = -21,  y = -5,  w = 20,  h =  4)
+            }
+            Type.TIME_ONLY -> {
+                height2 = Swing.defFont.size * 9
+                width2 = Swing.defFont.size * 40
+                progressBar.isVisible = false
+                messageLabel.isVisible = false
+                panel.add(progressLabel, x =   1,  y =  1,  w = -1,  h = 5)
+                panel.add(cancelButton,  x = -21,  y = -5,  w = 20,  h =  4)
+            }
+            Type.PROGRESS_ONLY -> {
+                height2 = Swing.defFont.size * 9
+                width2 = Swing.defFont.size * 40
+                progressBar.isVisible = false
+                messageLabel.isVisible = false
+                panel.add(progressLabel, x =   1,  y =  1,  w = -1,  h = 5)
+                panel.add(cancelButton,  x = -21,  y = -5,  w = 20,  h =  4)
+            }
         }
         pack()
 
         fontForAll         = Swing.defFont
         progressLabel.font = Swing.bigFont
-        size               = Dimension(width, height)
+        size               = Dimension(width2, height2)
 
         centerWindow()
 
@@ -97,34 +127,28 @@ class TaskDialog(val taskManager: TaskManager, val type: Type = Type.MESSAGE, pa
      * Start timer that executes all task(s) and thread(s)
      * Timer will also update dialog box info
      */
-    fun start(updateTime: Long = 100) {
+    fun start(updateTime: Long = 100, messages: Int = 4) {
         val start = System.currentTimeMillis()
 
         timer(period = updateTime, action = {
             if (taskManager.run(cancel) == true) {
-                val buffer = with(StringBuffer("<html><pre>")) {
-                    taskManager.messages(messageCount = if (taskManager.threadCount > 6) 6 else taskManager.threadCount).forEach {
-                        append(it)
-                        append("\n")
+                if (type != Type.TIME_ONLY && type != Type.PERCENT_ONLY) {
+                    val buffer ="<html><pre>" + taskManager.message(messages) + "</pre><html/>"
+
+                    if (buffer != message) {
+                        message           = buffer
+                        messageLabel.text = message
                     }
-
-                    append("</pre><html/>")
-                    toString()
                 }
 
-                if (buffer != message) {
-                    message           = buffer
-                    messageLabel.text = message
-                }
-
-                if (type == Type.PERCENT && taskManager.percent != percent) {
+                if ((type == Type.PERCENT || type == Type.PERCENT_ONLY) && taskManager.percent != percent) {
                     percent           = taskManager.percent
                     progressBar.value = percent
                 }
-                else if (type == Type.PROGRESS) {
+                else if (type == Type.PROGRESS || type == Type.PROGRESS_ONLY) {
                     progressLabel.text = taskManager.progress.format(" ")
                 }
-                else if (type == Type.TIME) {
+                else if (type == Type.TIME || type == Type.TIME_ONLY) {
                     progressLabel.text = TimeFormat.LONG_TIME.format((System.currentTimeMillis() - start), "UTC")
                 }
             }

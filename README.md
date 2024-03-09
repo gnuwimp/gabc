@@ -1,26 +1,36 @@
-# toMP3 is an audio file converter
+# AudioConverter
 
 ## About
-toMp3 converts an directory with audio or video files into one single mp3/ogg file.  
-The first version was only for mono audio books but it can now work with various formats.  
-It uses lame/oggenc/ffmpeg for all the transcoding.  
-All input files must have same samplerate and number of channels (stereo/mono) and bitwidth.  
-Beware that all files that are lossy encoded will be lose some audio quality when transcoded.  
-toMP3 is  written in [kotlin](https://kotlinlang.org) and released under the [GNU General Public License v3.0](LICENSE).  
+AudioConverter converts audio and video files of different formats.  
+It uses lame/oggenc/ffmpeg to encode and decode the files.  
+AudioConverter is  written in [kotlin](https://kotlinlang.org) and released under the [GNU General Public License v3.0](LICENSE).  
+
+## Convert to a single file
+Convert a directory of files (typical an audio book) to a single file.  
+All input files must have the same samplerate and number of channels (stereo/mono) and bitwidth.  
+
+## Convert file by file
+It will convert all files in a directory tree.  
+And it will also try to read and copy tags from the source files.  
 
 ## Download
-[Java](https://java.com) is needed to run [toMP3](https://github.com/gnuwimp/toMP3/releases).  
+Download AudioConverter from [here](https://github.com/gnuwimp/AudioConverter/releases).  
+[Java](https://java.com) is needed.  
 [Lame](https://lame.sourceforge.io) is used for encoding and decoding mp3 files.  
-And [oggenc](https://www.xiph.org/ogg) for encoding ogg files.  
-To decode aac/flac/wav/ogg/avi/mp4/mkv files [ffmpeg](https://www.ffmpeg.org) must be installed.
+Install [oggenc](https://www.xiph.org/ogg) to encode ogg files.  
+Install [ffmpeg](https://www.ffmpeg.org) to decode flac/wav/ogg/m4a/avi/mp4/mkv files .
 
 ## Usage
-Double click toMP3.jar file on windows to start the program.  
-Or run it from the command line with <code>java -jar toMP3.jar</code>.  
-toMP3 has been tested on Windows 10 and Ubuntu 21.04.  
+Double-click AudioConverter.jar file on windows to start the program.  
+Or run it from the command line with <code>java -jar AudioConverter.jar</code>.  
+AudioConverter has been tested on Windows 10 and Ubuntu 21.04.  
+
+## Screenshots
+<img src="images/audioconverter.png"/><br>
+<img src="images/audioconverter-2.png"/>
 
 ## Command Line Arguments  
-It can also use arguments, (use only ascii characters on Windows).  
+To convert files to a single file use these arguments, (use only ascii characters on Windows).  
 And use "" around text and paths with spaces.  
 <pre>
 --src  [PATH]              source directory with audio files
@@ -58,19 +68,32 @@ And use "" around text and paths with spaces.
 --auto2                    start automatically and quit even for error (optional)
 </pre>
 
-## Screenshots
-<img src="images/tomp3.png"/>
-<img src="images/tomp3-2.png"/>
+To convert file to file use these arguments:
+<pre>
+--mode2                    set this mode
+--start [PATH]             start directory with audio files
+--dest [PATH]              destination directory for target file
+--threads [COUNT]          set number of threads to use (optional, default 1)
+                             valid values are: 1 - 16
+--encoder [INDEX]          same options as above
+--auto                     start automatically and quit after successful encoding (optional)
+--auto2                    start automatically and quit even for error (optional)
+</pre>
 
 ## Changes
 <pre>
+2.4:    renamed again
+        added support for file to file conversion
+        ui changes
+        bug fixes
+
 2.3:    added jaudiotagger for tag writing
         added support for ogg encoding
         ui changes
         bitrate selection changed
 
 2.2:    renamed from gabc to toMP3
-        added support for more input files (aac/flac/ogg/wav/avi/mkv/mp4)
+        added support for more input files (m4a/flac/ogg/wav/avi/mkv/mp4)
         options for mono/stereo and vbr
         insert silence between tracks
         bug fixes
