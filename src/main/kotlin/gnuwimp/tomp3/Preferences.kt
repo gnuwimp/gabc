@@ -34,7 +34,7 @@ var Preferences.sourcePath: String
 
 //------------------------------------------------------------------------------
 var Preferences.winHeight: Int
-    get() = getInt("win_height", 420)
+    get() = getInt("win_height", 380)
 
     set(value) {
         putInt("win_height", value)
@@ -50,7 +50,7 @@ var Preferences.winMax: Boolean
 
 //------------------------------------------------------------------------------
 var Preferences.winWidth: Int
-    get() = getInt("win_width", 800)
+    get() = getInt("win_width", 600)
 
     set(value) {
         putInt("win_width", value)

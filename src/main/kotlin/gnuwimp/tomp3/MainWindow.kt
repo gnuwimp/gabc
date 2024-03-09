@@ -10,7 +10,6 @@ import gnuwimp.util.*
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.images.StandardArtwork
-import java.awt.Frame
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -24,53 +23,59 @@ class MainWindow : JFrame(APP_NAME) {
     companion object {
         const val APP_NAME = "toMP3"
         const val ABOUT_APP = "About toMP3"
-        const val ABOUT_TEXT: String = "<html>" +
-                "<h2>toMP3 2.2</h2>" +
+        val ABOUT_TEXT: String = "<html>" +
+                "<h2>toMP3 2.3</h2>" +
                 "<b>Copyright 2016 - 2021 gnuwimp@gmail.com.</b><br>" +
                 "Released under the GNU General Public License v3.0.<br>" +
                 "See <a href=\"https://github.com/gnuwimp/toMP3\">https://github.com/gnuwimp/toMP3</a>.<br>" +
-                "</font>" +
-                "<br>" +
-                "<b>toMP3</b> is an audio file (book or music) converter written in Kotlin.<br>" +
                 "Use toMP3 with caution and at your own risk.<br>" +
                 "<br>" +
-                "toMP3 converts one or more audio and video files into one mp3 file.<br>" +
-                "It uses lame for encoding and decoding mp3 files.<br>" +
-                "To decode aac/flac/wav/ogg/avi/mp4/mkv files ffmpeg must be installed.<br>" +
-                "Download lame from <a href=\"https://lame.sourceforge.net\">https://lame.sourceforge.net</a>.<br>" +
-                "And ffmpeg from <a href=\"https://www.ffmpeg.org\">https://www.ffmpeg.org</a>.<br>" +
+                "<b>About</b><br>" +
+                "toMP3</b> is an audio file converter written in Kotlin.<br>" +
+                "It started out as an audio book converter but can now also convert music and video files.<br>" +
+                "It takes a number of input files and converts them into one single mp3 or ogg file.<br>" +
                 "<br>" +
-                "Select a source directory with audio files.<br>" +
-                "All audio files in that directory will be converted to one mp3 file.<br>" +
+                "<b>Requirements</b><br>" +
+                "Lame is used for encoding and decoding mp3 files.<br>" +
+                "And oggenc for encoding ogg files.<br>" +
+                "To decode aac/flac/wav/ogg/avi/mp4/mkv files ffmpeg must be installed.<br>" +
+                "<br>" +
+                "Download lame from <a href=\"https://lame.sourceforge.net\">https://lame.sourceforge.net</a>.<br>" +
+                "Download oggenc from <a href=\"https://www.xiph.org/ogg\">https://www.xiph.org/ogg</a>.<br>" +
+                "Download ffmpeg from <a href=\"https://www.ffmpeg.org\">https://www.ffmpeg.org</a>.<br>" +
+                "<br>" +
+                "<b>Usage</b><br>" +
+                "Select a source directory with audio or video files.<br>" +
+                "All audio/video files in input directory will be converted to one mp3/ogg file.<br>" +
                 "They must have names that make them sorted in playing order.<br>" +
-                "And all input files must have same audio properties (<b>mono/stereo/samplerate/bitwidth</b>).<br>" +
+                "And all input files must have same audio properties (<i>mono/stereo/samplerate/bitwidth</i>).<br>" +
+                "<br>" +
+                "Then select one of the encoders in the list.<br>" +
+                "Use mono option to force stereo tracks to be converted to mono.<br>" +
                 "<br>" +
                 "The finished audio file will end up in the destination directory.<br>" +
-                "With <b>artist - title (year).mp3</b> or <b>artist - title.mp3</b> as file name<br>" +
-                "<br>" +
-                "Use VBR option to change between constant bit rate (CBR) and variable bit rate.<br>" +
-                "Large VBR files might be slow to seek in on slow devices.<br>" +
-                "Use mono option to force stereo tracks to converted to mono.<br>" +
-                "Set gap in seconds to add extra silence between tracks.<br>" +
+                "With <i>artist - title (year).mp3/ogg</i> or <i>artist - title.mp3/ogg</i> as file name<br>" +
                 "<br>" +
                 "<b>Command Line Arguments</b><br>" +
                 "toMP3.jar can be run from the command line to do the encoding automatically and quit when it has finished.<br>" +
-                "Use only ascii characters on Windows." +
+                "Use only ascii characters on Windows.<br>" +
+                "Wrap strings that contain spaces with double quotes (\"/my path/to files\").<br>" +
                 "<pre>" +
-                "--src  [source]            source directory with audio files<br>" +
-                "--dest [destination]       destination directory for target file<br>" +
-                "--cover [filename]         track cover image (optional)<br>" +
-                "--artist [name]            artist name<br>" +
-                "--title [name]             album and title name<br>" +
-                "--comment [comment tag]    comment string (optional)<br>" +
-                "--year [recording year]    track year (optional, 1 - 2100)<br>" +
-                "--genre [genre]            genre string (default Audiobook, optional)<br>" +
-                "--bitrate [mp3 bitrate]    bitrate for target file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, optional, default 48)<br>" +
-                "--gap [SECONDS]            insert silence between tracks (1 - 5 seconds, optional)<br>" +
-                "--mono                     convert stereo to mono (optional)<br>" +
-                "--vbr                      use VBR mode (optional)<br>" +
-                "--auto                     start automatically and quit after successful encoding<br>" +
-                "--auto2                    start automatically and quit even for error<br>" +
+                "--src  [PATH]              source directory with audio files\n" +
+                "--dest [PATH]              destination directory for target file\n" +
+                "--artist [TEXT]            artist name\n" +
+                "--title [TEXT]             album and title name\n" +
+                "--comment [TEXT]           comment string (optional)\n" +
+                "--cover [PATH]             track cover image (optional)\n" +
+                "--year [YYYY]              track year (optional, 1 - 2100)\n" +
+                "--genre [TEXT]             genre string (optional, default ${Parameters.DEFAULT_GENRE})\n" +
+                "--gap [SECONDS]            insert silence between tracks (optional, default 0)\n" +
+                "                             valid values are: 0 - 5\n" +
+                "--mono                     downmix stereo to mono (optional)\n" +
+                "--encoder                  index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
+                "${Encoders.toHelp}" +
+                "--auto                     start automatically and quit after successful encoding (optional)\n" +
+                "--auto2                    start automatically and quit even for error (optional)\n" +
                 "</pre>" +
                 "</html>"
     }
@@ -99,14 +104,14 @@ class MainWindow : JFrame(APP_NAME) {
     private val yearInput         = JTextField()
     private val genreLabel        = JLabel("Genre:")
     private val genreInput        = JTextField()
-    private val bitrateLabel      = JLabel("Bitrate:")
-    private val bitrateCombo      = ComboBox<String>(strings = listOf("32", "40", "48", "56", "64", "80", "96", "112", "128", "192", "256", "320"), 2)
+    private val encoderLabel      = JLabel("Encoder:")
+    private val encoderCombo      = ComboBox<String>(strings = Encoders.toNames, Encoders.DEFAULT.encoderIndex);
     private val gapLabel          = JLabel("Gap:")
     private val gapCombo          = ComboBox<String>(strings = listOf("0", "1", "2", "3", "4", "5"), 0)
-    private val monoLabel         = JLabel("Mono:")
-    private val monoCheck         = JCheckBox()
-    private val vbrLabel          = JLabel("VBR:")
-    private val vbrCheck          = JCheckBox()
+    private val channelLabel      = JLabel("Channels:")
+    private val channelGroup      = ButtonGroup()
+    private val channelMono       = JRadioButton("Mono")
+    private val channelStereo     = JRadioButton("Stereo")
     private val aboutButton       = JButton("About")
     private val logButton         = JButton("Show Log")
     private val convertButton     = JButton("Convert")
@@ -138,42 +143,44 @@ class MainWindow : JFrame(APP_NAME) {
         y += 5
         main.add(authorLabel, x = 1, y = y, w = w, h = 4)
         main.add(authorInput, x = w + 2, y = y, w = -22, h = 4)
-        main.add(logButton, x = -20, y = y, w = -1, h = 4)
+        main.add(aboutButton, x = -20, y = y, w = -1, h = 4)
 
         y += 5
         main.add(titleLabel, x = 1, y = y, w = w, h = 4)
         main.add(titleInput, x = w + 2, y = y, w = -22, h = 4)
-        main.add(convertButton, x = -20, y = y, w = -1, h = 4)
+        main.add(logButton, x = -20, y = y, w = -1, h = 4)
 
         y += 5
         main.add(commentLabel, x = 1, y = y, w = w, h = 4)
         main.add(commentInput, x = w + 2, y = y, w = -22, h = 4)
-        main.add(aboutButton, x = -20, y = y, w = -1, h = 4)
+        main.add(convertButton, x = -20, y = y, w = -1, h = 4)
 
         y += 5
         main.add(yearLabel, x = 1, y = y, w = w, h = 4)
-        main.add(yearInput, x = w + 2, y = y, w = -22, h = 4)
-        main.add(quitButton, x = -20, y = y, w = -1, h = 4)
+        main.add(yearInput, x = w + 2, y = y, w = 30, h = 4)
 
         y += 5
         main.add(genreLabel, x = 1, y = y, w = w, h = 4)
-        main.add(genreInput, x = w + 2, y = y, w = -22, h = 4)
-
-        y += 5
-        main.add(bitrateLabel, x = 1, y = y, w = w, h = 4)
-        main.add(bitrateCombo, x = w + 2, y = y, w = 15, h = 4)
+        main.add(genreInput, x = w + 2, y = y, w = 30, h = 4)
 
         y += 5
         main.add(gapLabel, x = 1, y = y, w = w, h = 4)
-        main.add(gapCombo, x = w + 2, y = y, w = 15, h = 4)
+        main.add(gapCombo, x = w + 2, y = y, w = 30, h = 4)
 
         y += 5
-        main.add(monoLabel, x = 1, y = y, w = w, h = 4)
-        main.add(monoCheck, x = w + 2, y = y, w = 15, h = 4)
+        main.add(encoderLabel, x = 1, y = y, w = w, h = 4)
+        main.add(encoderCombo, x = w + 2, y = y, w = 30, h = 4)
 
         y += 5
-        main.add(vbrLabel, x = 1, y = y, w = w, h = 4)
-        main.add(vbrCheck, x = w + 2, y = y, w = 15, h = 4)
+        main.add(channelLabel, x = 1, y = y, w = w, h = 4)
+        main.add(channelMono, x = w + 2, y = y, w = 15, h = 4)
+        main.add(channelStereo, x = w + 17, y = y, w = 15, h = 4)
+
+        main.add(quitButton, x = -20, y = -5, w = -1, h = 4)
+
+        channelGroup.add(channelMono)
+        channelGroup.add(channelStereo)
+        channelStereo.isSelected = true
 
         pack()
 
@@ -185,10 +192,10 @@ class MainWindow : JFrame(APP_NAME) {
         titleInput.toolTipText    = "Set title/artist name."
         yearInput.toolTipText     = "Set year for the audio book (optional, 1 - 2100)."
         genreInput.toolTipText    = "Set track genre (optional)."
-        bitrateCombo.toolTipText  = "Set bitrate for the result file (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320)."
+        encoderCombo.toolTipText  = "Select encoder for the result file."
         gapCombo.toolTipText      = "Insert silence between tracks (0 - 5 seconds)."
-        monoCheck.toolTipText     = "Force mono if input tracks are stereo."
-        vbrCheck.toolTipText      = "Use variable bit rate for the result file."
+        channelMono.toolTipText   = "Convert stereo tracks to mono."
+        channelStereo.toolTipText = "Keep tracks as they are, stereo or mono."
 
         sourceButton.toolTipText  = "Select source directory with all audio files."
         destButton.toolTipText    = "Select destination directory for the result file."
@@ -280,11 +287,10 @@ class MainWindow : JFrame(APP_NAME) {
             val title   = args.findString("--title", "")
             val comment = args.findString("--comment", "")
             val year    = args.findString("--year", "")
-            val genre   = args.findString("--genre", "Audiobook")
-            var bitrate = args.findString("--bitrate", "48")
-            var gap     = args.findString("--gap", "0")
+            val genre   = args.findString("--genre", Parameters.DEFAULT_GENRE)
+            var gap     = args.findInt("--gap", 0).toInt()
             val mono    = args.find("--mono") != -1
-            val vbr     = args.find("--vbr") != -1
+            val encoder = args.findInt("--encoder", Encoders.DEFAULT.encoderIndex.toLong()).toInt()
 
             if (args.find("--auto2") != -1) {
                 auto = 2
@@ -328,35 +334,13 @@ class MainWindow : JFrame(APP_NAME) {
                 genreInput.text = genre
             }
 
-            for ((i, b) in bitrateCombo.strings.withIndex()) {
-                if (b == bitrate) {
-                    bitrateCombo.selectedIndex = i
-                    bitrate = ""
-                    break
-                }
-            }
-
-            for ((i, g) in gapCombo.strings.withIndex()) {
-                if (g == gap) {
-                    gapCombo.selectedIndex = i
-                    gap = ""
-                    break
-                }
-            }
-
             if (mono == true) {
-                monoCheck.isSelected = true
+                channelMono.isSelected = true
             }
 
-            if (vbr == true) {
-                vbrCheck.isSelected = true
-            }
+            encoderCombo.selectedIndex = Encoders.toEncoder(encoder).encoderIndex
 
-            if (bitrate != "") {
-                throw Exception("error: invalid value for --bitrate ($bitrate)")
-            }
-
-            if (gap != "") {
+            if (gap < 0 || gap >= gapCombo.itemCount) {
                 throw Exception("error: invalid value for --gap ($gap)")
             }
 
@@ -364,11 +348,11 @@ class MainWindow : JFrame(APP_NAME) {
         }
         catch (e: Exception) {
             if (auto == 2) {
-                e.printStackTrace()
+                println(e.message)
                 quit()
             }
             else {
-                JOptionPane.showMessageDialog(null, e, MainWindow.APP_NAME, JOptionPane.ERROR_MESSAGE)
+                JOptionPane.showMessageDialog(null, e.message, APP_NAME, JOptionPane.ERROR_MESSAGE)
             }
 
             return false
@@ -386,18 +370,17 @@ class MainWindow : JFrame(APP_NAME) {
     //--------------------------------------------------------------------------
     private fun stage1SetParameters(): Parameters {
         val parameters = Parameters(
-            source  = sourceInput.text,
-            dest    = destInput.text,
-            cover   = imageInput.text,
-            artist  = authorInput.text,
-            title   = titleInput.text,
-            year    = yearInput.text,
-            comment = commentInput.text,
-            genre   = genreInput.text,
-            bitrate = bitrateCombo.text,
-            gap     = gapCombo.text,
-            mono    = monoCheck.isSelected,
-            vbr     = vbrCheck.isSelected
+            source      = sourceInput.text,
+            dest        = destInput.text,
+            cover       = imageInput.text,
+            artist      = authorInput.text,
+            title       = titleInput.text,
+            year        = yearInput.text,
+            comment     = commentInput.text,
+            genre       = genreInput.text,
+            encoder     = Encoders.toEncoder(encoderCombo.selectedIndex),
+            gap         = gapCombo.text,
+            mono        = channelMono.isSelected,
         )
 
         parameters.validate()
@@ -442,14 +425,14 @@ class MainWindow : JFrame(APP_NAME) {
     //--------------------------------------------------------------------------
     private fun stage4WriteTags(parameters: Parameters) {
         try {
-            val track = AudioFileIO.read(parameters.mp3)
+            val track = AudioFileIO.read(parameters.outputFile)
             val tag   = track.tagOrCreateDefault
 
             tag.setField(FieldKey.ALBUM, parameters.title)
             tag.setField(FieldKey.ALBUM_ARTIST, parameters.artist)
             tag.setField(FieldKey.ARTIST, parameters.artist)
             tag.setField(FieldKey.COMMENT, parameters.comment)
-            tag.setField(FieldKey.ENCODER, "lame")
+            tag.setField(FieldKey.ENCODER, parameters.encoder.encoderExe)
             tag.setField(FieldKey.GENRE, parameters.genre)
             tag.setField(FieldKey.TITLE, parameters.title)
             tag.setField(FieldKey.TRACK, "1")
@@ -467,7 +450,7 @@ class MainWindow : JFrame(APP_NAME) {
             track.commit()
         }
         catch (e: Exception) {
-            throw Exception("error: failed to write tags\n${e.message}")
+            throw Exception("error: failed to write tags\n${e.message.toString()}")
         }
     }
 
@@ -509,7 +492,7 @@ class MainWindow : JFrame(APP_NAME) {
             pref.winHeight = size.height
             pref.winX      = location.x
             pref.winY      = location.y
-            pref.winMax    = (extendedState and Frame.MAXIMIZED_BOTH != 0)
+            pref.winMax    = (extendedState and MAXIMIZED_BOTH != 0)
 
             pref.flush()
         }
@@ -519,26 +502,29 @@ class MainWindow : JFrame(APP_NAME) {
 
     //--------------------------------------------------------------------------
     fun run() {
-        var parameters = Parameters()
+        var file = File("")
 
         try {
-            Swing.logMessage = ""
-            parameters = stage1SetParameters()
+            val parameters = stage1SetParameters()
+            file = parameters.outputFile
             stage2LoadFiles(parameters)
             stage3Transcoding(parameters)
+            file = File("")
             stage4WriteTags(parameters)
 
-            Swing.logMessage = "encoding finished successfully with file '${parameters.mp3.name}'"
+            Swing.logMessage = "encoding finished successfully with file '${parameters.outputFile.name}'"
 
             if (auto != 0) {
                 quit()
             }
             else {
-                JOptionPane.showMessageDialog(this, "encoding finished successfully with file '${parameters.mp3.name}'", APP_NAME, JOptionPane.INFORMATION_MESSAGE)
+                JOptionPane.showMessageDialog(this, "encoding finished successfully with file '${parameters.outputFile.name}'", APP_NAME, JOptionPane.INFORMATION_MESSAGE)
             }
         }
         catch (e: Exception) {
-            parameters.mp3.remove()
+            if (file.isFile == true) {
+                file.remove()
+            }
 
             if (auto == 2) {
                 println("${e.message}")
