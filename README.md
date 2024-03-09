@@ -17,7 +17,7 @@ Download lame for windows at [rarewares](https://www.rarewares.org/mp3-lame-bund
 
 ## License & Download
 gABC is released under the [GNU General Public License v3.0](LICENSE).<br />
-A compiled jar file ready to run can be downloaded [here](bin/gabc.jar)<br />
+Downloaded from [here](https://github.com/gnuwimp/gabc/releases)<br />
 Double click to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".<br />
 
 <hr>
