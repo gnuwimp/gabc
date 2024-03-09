@@ -10,7 +10,8 @@ Be aware that the files will be transcoded and sound quality will be degraded so
 
 You will need [Java](http://java.com) installed to run this program.<br />
 The actual transcoding of audio files are done by [lame](http://lame.sourceforge.net).<br />
-And lame must be in application path.<br />
+It should run on all operating systems that has Java and lame installed.<br />
+Lame must be in application path.<br />
 
 <hr>
 
