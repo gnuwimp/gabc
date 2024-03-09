@@ -82,7 +82,7 @@ To convert file to file use these arguments:
 
 ## Changes
 <pre>
-2.4:    renamed again
+2.4:    renamed again from toMP3 to AudioConverter
         added support for file to file conversion
         ui changes
         bug fixes
