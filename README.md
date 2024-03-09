@@ -15,7 +15,7 @@ And it will also try to read and copy tags from the source files.
 
 ## Download
 Download AudioConverter from [here](https://github.com/gnuwimp/AudioConverter/releases).  
-[Java](https://java.com) is needed.  
+[Java](https://java.com) is needed (version 17+).  
 [Lame](https://lame.sourceforge.io) to encode mp3 files.  
 Install [oggenc](https://www.xiph.org/ogg) to encode ogg files.  
 Install [qaac64] (https://github.com/nu774/qaac/releases) to encode aac files (Windows/iTunes only).

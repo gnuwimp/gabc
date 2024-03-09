@@ -1,5 +1,5 @@
 /*
- * Copyright © 2016 - 2021 gnuwimp@gmail.com
+ * Copyright 2016 - 2024 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -54,7 +54,7 @@ class MainWindow : JFrame(Constants.APP_NAME) {
 
         //----------------------------------------------------------------------
         aboutButton.addActionListener {
-            AboutHandler(appName = Constants.ABOUT_APP, aboutText = Constants.aboutApp()).show(parent = Main.window)
+            AboutHandler(appName = Constants.ABOUT_APP, aboutText = Constants.aboutApp()).show(parent = Main.window, height = Swing.defFont.size * 55)
         }
 
         //----------------------------------------------------------------------
