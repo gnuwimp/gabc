@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 gnuwimp@gmail.com
+ Copyright 2021 - 2023 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -9,9 +9,9 @@ import gnuwimp.util.FileInfo
 
 object Decoder {
     //--------------------------------------------------------------------------
-    fun create(file: FileInfo): List<String> {
-        return if (file.ext.lowercase() == "mp3") {
-            listOf("lame", "--quiet", "--decode", file.filename, "-")
+    fun create(file: FileInfo, downmix: Boolean): List<String> {
+        return if (downmix == true) {
+            listOf("ffmpeg", "-loglevel", "level+quiet", "-i", file.filename, "-f", "wav", "-ac", "1", "-")
         }
         else {
             listOf("ffmpeg", "-loglevel", "level+quiet", "-i", file.filename, "-f", "wav", "-")

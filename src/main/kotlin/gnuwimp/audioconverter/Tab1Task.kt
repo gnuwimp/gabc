@@ -28,7 +28,7 @@ class Tab1Task(val parameters: Tab1Parameters) : Task(max = parameters.audioFile
 
             for (file in parameters.audioFiles) {
                 val buffer        = ByteArray(size = 131_072)
-                val decoderParams = Decoder.create(file)
+                val decoderParams = Decoder.create(file, parameters.mono)
                 var parseHeader   = true
 
                 Swing.logMessage = decoderParams.joinToString(separator = " ")

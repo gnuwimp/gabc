@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 gnuwimp@gmail.com
+ Copyright 2021 - 2023 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -130,14 +130,14 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
         //----------------------------------------------------------------------
         destButton.addActionListener {
-            val dialog = JFileChooser(Main.pref.destPathFile)
+            val dialog = JFileChooser(Main.pref.getFile(destInput.text, Main.pref.tab1DestFile))
 
             dialog.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
             dialog.fontForAll        = Swing.defFont
 
-            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory) {
-                destInput.text     = dialog.selectedFile.canonicalPath
-                Main.pref.destPath = dialog.selectedFile.canonicalPath
+            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory == true) {
+                destInput.text         = dialog.selectedFile.canonicalPath
+                Main.pref.tab1DestPath = dialog.selectedFile.canonicalPath
             }
         }
 
@@ -148,12 +148,12 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
         //----------------------------------------------------------------------
         imageButton.addActionListener {
-            val dialog = ImageFileDialog(Main.pref.imagePath, this)
+            val dialog = ImageFileDialog(Main.pref.getFile(imageInput.text, Main.pref.tab1ImageFile).canonicalPath, this)
             val file   = dialog.file
 
-            if (file != null && file.isImage) {
-                imageInput.text     = file.canonicalPath
-                Main.pref.imagePath = file.parentFile.canonicalPath
+            if (file != null && file.isImage == true) {
+                imageInput.text         = file.canonicalPath
+                Main.pref.tab1ImagePath = file.parentFile.canonicalPath
             }
             else {
                 imageInput.text = ""
@@ -162,14 +162,14 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
         //----------------------------------------------------------------------
         sourceButton.addActionListener {
-            val dialog = JFileChooser(Main.pref.sourcePathFile)
+            val dialog = JFileChooser(Main.pref.getFile(sourceInput.text, Main.pref.tab1SourceFile))
 
             dialog.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
             dialog.fontForAll        = Swing.defFont
 
-            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory) {
-                sourceInput.text     = dialog.selectedFile.canonicalPath
-                Main.pref.sourcePath = dialog.selectedFile.canonicalPath
+            if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION && dialog.selectedFile.isDirectory == true) {
+                sourceInput.text         = dialog.selectedFile.canonicalPath
+                Main.pref.tab1SourcePath = dialog.selectedFile.canonicalPath
             }
         }
     }

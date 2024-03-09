@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 gnuwimp@gmail.com
+ Copyright 2021 - 2023 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -29,7 +29,15 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
     OGG_192(15, "Ogg ~192 Kbps", "ogg", "oggenc", "-q6"),
     OGG_256(16, "Ogg ~256 Kbps", "ogg", "oggenc", "-q8"),
     OGG_320(17, "Ogg ~320 Kbps", "ogg", "oggenc", "-q9"),
-    OGG_500(18, "Ogg ~500 Kbps", "ogg", "oggenc", "-q10");
+    OGG_500(18, "Ogg ~500 Kbps", "ogg", "oggenc", "-q10"),
+
+    AAC_CBR_48(19, "AAC HE/CBR 48 Kbps", "m4a", "qaac64", "--he", "--cbr", "48"),
+    AAC_CBR_80(20, "AAC HE/CBR 80 Kbps", "m4a", "qaac64", "--he", "--cbr", "80"),
+    AAC_CVBR_96(21, "AAC CVBR ~96 Kbps", "m4a", "qaac64", "--cvbr", "96"),
+    AAC_TVBR_128(22, "AAC TVBR63 ~128 Kbps", "m4a", "qaac64", "--tvbr", "63"),
+    AAC_TVBR_256(23, "AAC TVBR109 ~256 Kbps", "m4a", "qaac64", "--tvbr", "109"),
+    AAC_TVBR_320(24, "AAC TVBR127 ~320 Kbps", "m4a", "qaac64", "--tvbr", "127"),
+    AAC_ALAC(25, "AAC ALAC", "m4a", "qaac64", "--alac");
 
     var encoderIndex = index
     var encoderName  = name
@@ -43,7 +51,7 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
         }
     }
     companion object {
-        private val LAST = OGG_500
+        private val LAST = AAC_ALAC
         val DEFAULT = MP3_CBR_128
 
         //--------------------------------------------------------------------------
@@ -51,8 +59,11 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
             return if (par.encoder.fileExt == "mp3") {
                 createMP3Encoder(par, wavHeader)
             }
+            else return if (par.encoder.fileExt == "m4a") {
+                createAACEncoder(par, wavHeader)
+            }
             else {
-                createOggEncoder(par, wavHeader)
+                createOGGEncoder(par, wavHeader)
             }
         }
 
@@ -61,27 +72,97 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
             return if (par.encoder.fileExt == "mp3") {
                 createMP3Encoder(par, wavHeader, file)
             }
-            else {
-                createOggEncoder(par, wavHeader, file)
+            else return if (par.encoder.fileExt == "m4a") {
+                createAACEncoder(par, wavHeader, file)
             }
+            else {
+                createOGGEncoder(par, wavHeader, file)
+            }
+        }
+
+        //--------------------------------------------------------------------------
+        private fun createAACEncoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
+            val list = mutableListOf<String>()
+
+            list.add(par.encoder.encoderExe)
+            list.add("--silent")
+
+            list.add("--raw")
+            list.add("--raw-channels")
+
+            if (wavHeader.channels == WavHeader.MONO) {
+                list.add("1")
+            }
+            else {
+                list.add("2")
+            }
+
+            list.add("--raw-rate")
+            list.add(wavHeader.sampleRateString2)
+
+            list.add("--raw-format")
+            list.add("S${wavHeader.bitWidth}L")
+
+            par.encoder.encoderArg.forEach {
+                list.add(it)
+            }
+
+            list.add("-")
+            list.add("-o")
+            list.add(par.outputFile.absolutePath)
+
+            return list
+        }
+
+        //--------------------------------------------------------------------------
+        private fun createAACEncoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
+            val list = mutableListOf<String>()
+
+            list.add(par.encoder.encoderExe)
+            list.add("--silent")
+            list.add("--raw")
+            list.add("--raw-channels")
+
+            if (wavHeader.channels == WavHeader.MONO) {
+                list.add("1")
+            }
+            else {
+                list.add("2")
+            }
+
+            list.add("--raw-rate")
+            list.add(wavHeader.sampleRateString2)
+
+            list.add("--raw-format")
+            list.add("S${wavHeader.bitWidth}L")
+
+            par.encoder.encoderArg.forEach {
+                list.add(it)
+            }
+
+            list.add("-")
+            list.add("-o")
+            list.add(file.canonicalPath)
+
+            return list
         }
 
         //--------------------------------------------------------------------------
         private fun createMP3Encoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
             val list = mutableListOf<String>()
 
-            list.add("lame")
+            list.add(par.encoder.encoderExe)
             list.add("--quiet")
 
             if (wavHeader.channels == WavHeader.MONO) {
                 list.add("-m")
                 list.add("m")
             }
-            else if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
-                list.add("-m")
-                list.add("m")
-                list.add("-a")
-            }
+//            else if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
+//                list.add("-m")
+//                list.add("m")
+//                list.add("-a")
+//            }
 
             list.add("-r")
             list.add("-s")
@@ -104,7 +185,7 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
         private fun createMP3Encoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
             val list = mutableListOf<String>()
 
-            list.add("lame")
+            list.add(par.encoder.encoderExe)
             list.add("--quiet")
 
             if (wavHeader.channels == WavHeader.MONO) {
@@ -130,10 +211,10 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
         }
 
         //--------------------------------------------------------------------------
-        private fun createOggEncoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
+        private fun createOGGEncoder(par: Tab1Parameters, wavHeader: WavHeader): List<String> {
             val list = mutableListOf<String>()
 
-            list.add("oggenc")
+            list.add(par.encoder.encoderExe)
             list.add("--quiet")
 
             list.add("-r")
@@ -151,9 +232,9 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
                 list.add(it)
             }
 
-            if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
-                list.add("--downmix")
-            }
+//            if (par.mono == true && wavHeader.channels == WavHeader.STEREO) {
+//                list.add("--downmix")
+//            }
 
             list.add("-o")
             list.add(par.outputFile.absolutePath)
@@ -163,10 +244,10 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
         }
 
         //--------------------------------------------------------------------------
-        private fun createOggEncoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
+        private fun createOGGEncoder(par: Tab2Parameters, wavHeader: WavHeader, file: FileInfo): List<String> {
             val list = mutableListOf<String>()
 
-            list.add("oggenc")
+            list.add(par.encoder.encoderExe)
             list.add("--quiet")
 
             list.add("-r")
@@ -213,6 +294,13 @@ enum class Encoders(index: Int, name: String, ext: String, exe: String, vararg p
                 OGG_256.encoderIndex -> OGG_256
                 OGG_320.encoderIndex -> OGG_320
                 OGG_500.encoderIndex -> OGG_500
+                AAC_CBR_48.encoderIndex -> AAC_CBR_48
+                AAC_CBR_80.encoderIndex -> AAC_CBR_80
+                AAC_CVBR_96.encoderIndex -> AAC_CVBR_96
+                AAC_TVBR_128.encoderIndex -> AAC_TVBR_128
+                AAC_TVBR_256.encoderIndex -> AAC_TVBR_256
+                AAC_TVBR_320.encoderIndex -> AAC_TVBR_320
+                AAC_ALAC.encoderIndex -> AAC_ALAC
                 else -> throw Exception("error: encoder index is out of range ($index)\nvalid values are from 0 to ${LAST.encoderIndex}")
             }
         }
