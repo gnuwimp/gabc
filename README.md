@@ -92,7 +92,7 @@ To convert file to file use these arguments:
 <pre>
 2.5:    added aac encoding (Windows only, requires iTunes + qaac64)
         minor improvements
-        added Jaudiotagger library to the source tree
+        updated Jaudiotagger library and added it to the source tree
 
 2.4:    renamed again from toMP3 to AudioConverter
         added support for file to file conversion
