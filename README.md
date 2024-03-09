@@ -20,8 +20,8 @@ gABC is released under the [GNU General Public License v3.0](LICENSE).<br />
 ## Download
 Download from [here](https://github.com/gnuwimp/gabc/releases).<br />
 Download lame for windows at [rarewares](https://www.rarewares.org/mp3-lame-bundle.php).<br />
-Double click gabc,jar file onf windows to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".
-You can also set the input fields from the command line "<code>java -jar c:\bin\gabc.jar D:\book\book1 D:\book D:\book\book1\cover.jpg "Author" "Title" "Comment" 2001 3</code>".<br />
+Double click gabc.jar file on windows to start the program or run it from the command line with "<code>java -jar gabc.jar</code>".
+You can also set the input fields from the command line "<code>java -jar c:\bin\gabc.jar D:\AudioBook D:\ D:\AudioBook\cover.jpg "Author" "Title" "Comment" 2001 3</code>".<br />
 
 <hr>
 
