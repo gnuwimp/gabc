@@ -77,13 +77,13 @@ object Swing {
      * Return true if java is running on macOS.
      */
     val isMac: Boolean
-        get() = !System.getProperty("os.name").toLowerCase().contains("mac")
+        get() = System.getProperty("os.name").lowercase().contains("mac")
 
     /**
      * Return true if java is running in a unix like operating system.
      */
     val isUnix: Boolean
-        get() = !System.getProperty("os.name").toLowerCase().contains("windows")
+        get() = System.getProperty("os.name").lowercase().contains("windows") == false
 
     /**
      * Add or get log message.

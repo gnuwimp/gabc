@@ -29,7 +29,7 @@ fun Closeable.safeClose(): Boolean {
  */
 val File.isAudio: Boolean
     get() {
-        val lower = extension.toLowerCase()
+        val lower = extension.lowercase()
 
         return if (isFile == false) {
             false

@@ -92,17 +92,17 @@ fun String.capWords(mode: String): String {
 
         when (mode) {
             "words" -> {
-                if (c.isLetter() && flip) {
+                if (c.isLetter() == true && flip == true) {
                     flip = false
-                    c = c.toUpperCase()
+                    c = c.uppercaseChar()
                 }
-                else if (c.isLetter())
-                    c = c.toLowerCase()
+                else if (c.isLetter() == true)
+                    c = c.lowercaseChar()
                 else
                     flip = true
             }
-            "lower" -> c = c.toLowerCase()
-            "upper" -> c = c.toUpperCase()
+            "lower" -> c = c.lowercaseChar()
+            "upper" -> c = c.uppercaseChar()
         }
 
         value += c
