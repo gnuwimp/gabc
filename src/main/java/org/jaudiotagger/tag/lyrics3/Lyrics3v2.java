@@ -22,18 +22,22 @@
  */
 package org.jaudiotagger.tag.lyrics3;
 
-import org.jaudiotagger.tag.*;
-import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
-import org.jaudiotagger.tag.id3.AbstractTag;
-import org.jaudiotagger.tag.id3.ID3v1Tag;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import org.jaudiotagger.tag.InvalidTagException;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.TagNotFoundException;
+import org.jaudiotagger.tag.TagOptionSingleton;
+import org.jaudiotagger.tag.id3.AbstractID3v2Frame;
+import org.jaudiotagger.tag.id3.AbstractTag;
+import org.jaudiotagger.tag.id3.ID3v1Tag;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 public class Lyrics3v2 extends AbstractLyrics3
 {
@@ -97,19 +101,19 @@ public class Lyrics3v2 extends AbstractLyrics3
 
                 while (iterator.hasNext())
                 {
-					try
+					try 
 					{
 						List<TagField> fields = iterator.next();
-						for(TagField element : fields)
+						for(TagField element : fields) 
 						{
-							if (element instanceof AbstractID3v2Frame)
+							if (element instanceof AbstractID3v2Frame) 
 							{
 								AbstractID3v2Frame frame = (AbstractID3v2Frame) element;
-								if(Lyrics3v2Field.isLyrics3v2Field(frame) )
+								if(Lyrics3v2Field.isLyrics3v2Field(frame) ) 
 								{
 									newField = new Lyrics3v2Field(frame);
-
-									if (newField != null)
+		
+									if (newField != null) 
 									{
 										fieldMap.put(newField.getIdentifier(), newField);
 									}

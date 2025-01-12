@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 - 2024 gnuwimp@gmail.com
+ * Copyright 2020 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 

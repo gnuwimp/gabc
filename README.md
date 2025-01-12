@@ -15,16 +15,16 @@ And it will also try to read and copy tags from the source files.
 
 ## Download
 Download AudioConverter from [here](https://github.com/gnuwimp/AudioConverter/releases).  
-[Java](https://java.com) is needed (version 17+).  
-[Lame](https://lame.sourceforge.io) to encode mp3 files.  
+Install [Java](https://java.com).  
+Install [ffmpeg](https://www.ffmpeg.org) to decode flac/wav/ogg/m4a/avi/mp4/mkv files.  
+Install [Lame](https://lame.sourceforge.io) to encode mp3 files.  
 Install [oggenc](https://www.xiph.org/ogg) to encode ogg files.  
-Install [qaac64] (https://github.com/nu774/qaac/releases) to encode aac files (Windows/iTunes only).
-Install [ffmpeg](https://www.ffmpeg.org) to decode flac/wav/ogg/m4a/avi/mp4/mkv files.
+Install [qaac64](https://github.com/nu774/qaac/releases) to encode aac files (Windows + iTunes are needed).  
 
 ## Usage
 Double-click AudioConverter.jar file on windows to start the program.  
 Or run it from the command line with <code>java -jar AudioConverter.jar</code>.  
-AudioConverter has been tested on Windows 10 and Ubuntu 21.04.  
+AudioConverter has been tested on Windows 10 and Ubuntu 24.10.  
 
 ## Screenshots
 <img src="images/audioconverter.png"/><br>
@@ -40,11 +40,13 @@ And use "" around text and paths with spaces.
 --title [TEXT]             album and title name
 --comment [TEXT]           comment string (optional)
 --cover [PATH]             track cover image (optional)
---year [YYYY]              track year (optional, 1 - 2100)
+--year [YYYY]              track year (optional, 1 - 9999)
 --genre [TEXT]             genre string (optional, default Audiobook)
 --gap [SECONDS]            insert silence between tracks (optional, default 0)
                              valid values are: 0 - 5
 --mono                     downmix stereo to mono (optional)
+--overwrite [VALUE]        overwrite destination files (optional, default 0)
+                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all
 --encoder [INDEX]          index in encoder list (optional, default 4 -> MP3 CBR 128 Kbps)
                              0 = MP3 CBR 32 Kbps
                              1 = MP3 CBR 48 Kbps
@@ -79,10 +81,12 @@ And use "" around text and paths with spaces.
 To convert file to file use these arguments:
 <pre>
 --mode2                    set this mode
---start [PATH]             start directory with audio files
+--src [PATH]               start directory with audio files
 --dest [PATH]              destination directory for target file
 --threads [COUNT]          set number of threads to use (optional, default 1)
-                             valid values are: 1 - 16
+                             valid values are: 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 24, 32, 48, 64, 96, 128
+--overwrite [VALUE]        overwrite destination files (optional, default 0)
+                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all
 --encoder [INDEX]          same options as above
 --auto                     start automatically and quit after successful encoding (optional)
 --auto2                    start automatically and quit even for error (optional)
@@ -90,6 +94,9 @@ To convert file to file use these arguments:
 
 ## Changes
 <pre>
+2.6:    added overwrite destination files option
+        some bug fixes and improvements
+
 2.5:    added aac encoding (Windows only, requires iTunes + qaac64)
         minor improvements
         updated Jaudiotagger library and added it to the source tree

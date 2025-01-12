@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -9,15 +9,10 @@ import gnuwimp.util.getIntAt
 
 //------------------------------------------------------------------------------
 class WavHeader {
-    companion object {
-        const val MONO   = 1.toShort()
-        const val STEREO = 2.toShort()
-    }
-
     val sampleRateString: String
     val sampleRateString2: String
     val sampleRate: Int
-    val channels: Short
+    val channels: Constants.Channels
     val channelString: String
     val bitWidth: Short
     val data: Int
@@ -27,7 +22,7 @@ class WavHeader {
         sampleRate = 0
         sampleRateString = ""
         sampleRateString2 = ""
-        channels = 0
+        channels = Constants.Channels.INVALID
         channelString = ""
         bitWidth = 0
         data = 0
@@ -43,15 +38,16 @@ class WavHeader {
             throw Exception("error: this is not wav data")
         }
 
-        channels   = buffer[22].toShort()
+        val ch     = buffer[22].toShort()
+        channels   = if (ch == 1.toShort()) Constants.Channels.MONO else if (ch == 2.toShort()) Constants.Channels.STEREO else Constants.Channels.INVALID
         sampleRate = buffer.getIntAt(24).toInt()
         bitWidth   = buffer[34].toShort()
 
-        if (channels < 1 || channels > 2) {
-            throw Exception("error: channel count ($channels) is out of range")
+        if (channels == Constants.Channels.INVALID) {
+            throw Exception("error: channel count ($ch) is out of range")
         }
 
-        channelString = if (channels == 1.toShort()) "mono" else "stereo"
+        channelString = if (channels == Constants.Channels.MONO) "mono" else "stereo"
 
         if (bitWidth != 8.toShort() && bitWidth != 16.toShort() && bitWidth != 24.toShort() && bitWidth != 32.toShort()) {
             throw Exception("error: bitwidth ($bitWidth) is out of range")

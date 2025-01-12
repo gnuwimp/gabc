@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -85,7 +85,7 @@ var Preferences.tab2SourcePath: String
 
 //------------------------------------------------------------------------------
 var Preferences.winHeight: Int
-    get() = getInt("win_height", 500)
+    get() = getInt("win_height", 550)
 
     set(value) {
         putInt("win_height", value)

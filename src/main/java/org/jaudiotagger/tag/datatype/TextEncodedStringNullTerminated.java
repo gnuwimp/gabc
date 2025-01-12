@@ -18,15 +18,19 @@ import java.util.logging.Level;
  */
 public class TextEncodedStringNullTerminated extends AbstractString
 {
+
+
     /**
      * Creates a new TextEncodedStringNullTerminated datatype.
      *
-     * @param identifier identifies the frame type
+     * @param identifier                             identifies the frame type
      * @param frameBody
+     * @param isAllowReadMetadataWithOverrideCharset
      */
-    public TextEncodedStringNullTerminated(String identifier, AbstractTagFrameBody frameBody)
+    public TextEncodedStringNullTerminated(String identifier, AbstractTagFrameBody frameBody, boolean isAllowReadMetadataWithOverrideCharset)
     {
         super(identifier, frameBody);
+        this.isAllowReadMetadataWithOverrideCharset=isAllowReadMetadataWithOverrideCharset;
     }
 
     /**
@@ -73,6 +77,7 @@ public class TextEncodedStringNullTerminated extends AbstractString
 
         //Get the Specified Decoder
         final Charset charset = getTextEncodingCharSet();
+
 
 
         //We only want to load up to null terminator, data after this is part of different

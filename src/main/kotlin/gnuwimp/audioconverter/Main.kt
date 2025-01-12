@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -62,12 +62,12 @@ object Main {
                 if (tabs2 == true && window.tab2.argLoad(args) == true) {
                     window.tabs.selectedIndex = 1
 
-                    if (window.tab2.auto != 0) {
+                    if (window.tab2.auto != Constants.Auto.NO) {
                         window.tab2.run()
                     }
                 }
                 else if (tabs2 == false && window.tab1.argLoad(args) == true) {
-                    if (window.tab1.auto != 0) {
+                    if (window.tab1.auto != Constants.Auto.NO) {
                         window.tab1.run()
                     }
                 }

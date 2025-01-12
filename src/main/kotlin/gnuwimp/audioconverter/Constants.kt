@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2024 gnuwimp@gmail.com
+ * Copyright 2021 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -22,7 +22,7 @@ object Constants {
     const val TAB1_AUTHORINPUT_TOOLTIP   = "Set artist/author name."
     const val TAB1_COMMENTINPUT_TOOLTIP  = "Set comment string (optional)."
     const val TAB1_TITLEINPUT_TOOLTIP    = "Set title/artist name."
-    const val TAB1_YEARINPUT_TOOLTIP     = "Set year for the audio book (optional, 1 - 2100)."
+    const val TAB1_YEARINPUT_TOOLTIP     = "Set year for the audio book (optional, 1 - 9999)."
     const val TAB1_GENREINPUT_TOOLTIP    = "Set track genre (optional)."
     const val TAB1_GAPCOMBO_TOOLTIP      = "Insert silence between tracks (0 - 5 seconds)."
     const val TAB1_CHANNELMONO_TOOLTIP   = "Convert stereo tracks to mono."
@@ -34,6 +34,25 @@ object Constants {
     const val TAB2_DESTINPUT_TOOLTIP     = "Select destination directory."
     const val TAB2_THREADS_TOOLTIP       = "Set number of threads to use when converting files."
     val       TAB2_THREADS               = listOf("1", "2", "3", "4", "5", "6", "7", "8", "12", "16", "24", "32", "48", "64", "96", "128")
+    val       TAB2_OVERWRITE             = listOf("0", "1", "2")
+
+    enum class Auto {
+        NO,
+        YES_STOP_ON_ERROR,
+        YES_QUIT_ON_ERROR
+    }
+
+    enum class Channels {
+        INVALID,
+        MONO,
+        STEREO,
+    }
+
+    enum class Overwrite {
+        NO,
+        OLDER,
+        ALL
+    }
 
     val TAB1_HELP_TEXT: String = "<html>" +
             "<h2>Convert a directory with files into one mp3/ogg file</h2>" +
@@ -63,18 +82,21 @@ object Constants {
             "--title [TEXT]             album and title name\n" +
             "--comment [TEXT]           comment string (optional)\n" +
             "--cover [PATH]             track cover image (optional)\n" +
-            "--year [YYYY]              track year (optional, 1 - 2100)\n" +
+            "--year [YYYY]              track year (optional, 1 - 9999)\n" +
             "--genre [TEXT]             genre string (optional, default ${Tab1Parameters.DEFAULT_GENRE})\n" +
             "--gap [SECONDS]            insert silence between tracks (optional, default 0)\n" +
             "                             valid values are: 0 - 5\n" +
             "--mono                     downmix stereo to mono (optional)\n" +
+            "--overwrite [VALUE]        overwrite destination files (optional, default 0)\n" +
+            "                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all\n" +
             "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             Encoders.toHelp +
             "--auto                     start automatically and quit after successful encoding (optional)\n" +
             "--auto2                    start automatically and quit even for error (optional)\n" +
+            "<br><br><br>" +
             "</pre>" +
-
             "</html>"
+
     val TAB2_HELP_TEXT: String = "<html>" +
             "<h2>Convert all files in a directory tree to mp3/ogg</h2>" +
 
@@ -102,21 +124,23 @@ object Constants {
             "--dest [PATH]              destination directory for target file\n" +
             "--threads [COUNT]          set number of threads to use (optional, default 1)\n" +
             "                             valid values are: 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 24, 32, 48, 64, 96, 128\n" +
+            "--overwrite [VALUE]        overwrite destination files (optional, default 0)\n" +
+            "                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all\n" +
             "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             Encoders.toHelp +
             "--auto                     start automatically and quit after successful encoding (optional)\n" +
             "--auto2                    start automatically and quit even for error (optional)\n" +
+            "<br><br><br>" +
             "</pre>" +
-
             "</html>"
 
     //----------------------------------------------------------------------
     fun aboutApp(): String {
         var about = "<html>" +
 
-        "<h2>AudioConverter 2.5</h2>" +
+        "<h2>AudioConverter 2.6</h2>" +
 
-        "Copyright 2021 - 2024 gnuwimp@gmail.com.<br>" +
+        "Copyright 2021 - 2025 gnuwimp@gmail.com.<br>" +
         "Released under the GNU General Public License v3.0.<br>" +
         "See <a href=\"https://github.com/gnuwimp/AudioConverter\">https://github.com/gnuwimp/AudioConverter</a>.<br>" +
         "Use AudioConverter with caution and at your own risk.<br>" +
@@ -149,7 +173,7 @@ object Constants {
 
         about += "Java: " + System.getProperty("java.version") + "<br>"
         about += "Kotlin: " + KotlinVersion.CURRENT + "<br>"
-        about += "JAudioTagger: 3.01"
+        about += "JAudioTagger: 3.0.2-SNAPSHOT" + "<br><br><br>"
         about += "<html>"
 
         return about

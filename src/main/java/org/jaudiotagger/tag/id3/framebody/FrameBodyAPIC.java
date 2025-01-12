@@ -283,7 +283,7 @@ public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24Frame
         objectList.add(new NumberHashMap(DataTypes.OBJ_TEXT_ENCODING, this, TextEncoding.TEXT_ENCODING_FIELD_SIZE));
         objectList.add(new StringNullTerminated(DataTypes.OBJ_MIME_TYPE, this));
         objectList.add(new NumberHashMap(DataTypes.OBJ_PICTURE_TYPE, this, PictureTypes.PICTURE_TYPE_FIELD_SIZE));
-        objectList.add(new TextEncodedStringNullTerminated(DataTypes.OBJ_DESCRIPTION, this));
+        objectList.add(new TextEncodedStringNullTerminated(DataTypes.OBJ_DESCRIPTION, this, false));
         objectList.add(new ByteArraySizeTerminated(DataTypes.OBJ_PICTURE_DATA, this));
     }
 

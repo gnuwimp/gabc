@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -148,7 +148,9 @@ fun List<Task>.throwFirstError() {
  * It uses Task objects to calculate progress values and execute task(s) in thread(s).
  * Thread count can't be more than task count.
  */
-open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onError: Execution = Execution.CONTINUE, val onCancel: Execution = Execution.STOP_JOIN) {
+open class TaskManager(val tasks: List<Task>, val maxThreads: Int = 1, val onError: Execution = Execution.CONTINUE, val onCancel: Execution = Execution.STOP_JOIN) {
+    var runningThreads = 0
+
     /**
      * Flags for Progress actions when running threads
      */
@@ -160,6 +162,12 @@ open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onEr
 
     val total: Long
     private val threadList= mutableListOf<TaskThread?>()
+
+    /**
+     * Get number of active threads
+     */
+    val activeThreads: Int
+        get() = runningThreads
 
     /**
      * Return percent value, between 0 and 100
@@ -175,11 +183,11 @@ open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onEr
 
     //--------------------------------------------------------------------------
     init {
-        require(threadCount > 0 && tasks.size > 0)
+        require(maxThreads > 0 && tasks.size > 0)
 
         total = tasks.sumByLong(Task::max)
 
-        for (f in 1..threadCount) {
+        for (f in 1..maxThreads) {
             threadList.add(null)
         }
     }
@@ -221,6 +229,8 @@ open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onEr
      * Returns false if it has stopped because of error or no more tasks to run
      */
     fun run(cancel: Boolean = false): Boolean {
+        runningThreads = 0
+
         val failed = threadList.any {
             it?.task?.status == Task.Status.ERROR
         }
@@ -259,6 +269,10 @@ open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onEr
                         }
                     }
                 }
+
+                if (threadList[i] != null) {
+                    runningThreads++
+                }
             }
 
             return tasks.any {
@@ -280,7 +294,7 @@ open class TaskManager(val tasks: List<Task>, val threadCount: Int = 1, val onEr
 
         Thread.sleep(1_000)
 
-        for (i in 0 until threadCount) {
+        for (i in 0 until maxThreads) {
             threadList[i]?.let { thread ->
                 if (stop == Execution.STOP_JOIN) {
                     thread.join()

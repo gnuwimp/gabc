@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -8,11 +8,14 @@ package gnuwimp.audioconverter
 import gnuwimp.util.FileInfo
 import gnuwimp.util.isImage
 import gnuwimp.util.numOrZero
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.images.Artwork
 import java.io.File
 
 //------------------------------------------------------------------------------
-class Tab1Parameters(val source: String, val dest: String, val cover: String, val artist: String, val title: String, val year: String, val comment: String, val genre: String, val encoder: Encoders, val gap: String, val mono: Boolean) {
-    var audioFiles: List<FileInfo> = listOf()
+class Tab1Parameters(val audioFiles: List<FileInfo>, val source: String, val dest: String, val cover: String, var artist: String, var album: String, var year: String, val comment: String, var genre: String, val encoder: Encoders, val gap: String, val mono: Boolean, val overwrite: Constants.Overwrite) {
+    var image: Artwork? = null
 
     companion object {
         const val DEFAULT_GENRE = "Audiobook"
@@ -20,14 +23,19 @@ class Tab1Parameters(val source: String, val dest: String, val cover: String, va
 
     //--------------------------------------------------------------------------
     val outputFile: File
+        get() = File(outputFileName)
+
+    //--------------------------------------------------------------------------
+    val outputFileName: String
         get() {
-            val name = FileInfo.safeName("$artist - $title")
+            val name = FileInfo.safeName("$artist - $album")
+            val tmp  = if (dest.endsWith(File.separator) == true) dest else dest + File.separator
 
             return if (year != "") {
-                File("$dest${File.separator}$name ($year).${encoder.fileExt}")
+                return "$tmp$name ($year).${encoder.fileExt}"
             }
             else {
-                File("$dest${File.separator}$name.${encoder.fileExt}")
+                return "$tmp$name.${encoder.fileExt}"
             }
         }
 
@@ -39,13 +47,59 @@ class Tab1Parameters(val source: String, val dest: String, val cover: String, va
             throw Exception("error: missing destination directory => '$dest'")
         }
 
+        try {
+            val file0 = AudioFileIO.read(audioFiles[0].file)
+            val tag0  = file0.tag
+
+            if (tag0 != null) {
+                if (artist.isBlank() == true) {
+                    artist = tag0.getFirst(FieldKey.ARTIST)
+                }
+
+                if (album.isBlank() == true) {
+                    album = tag0.getFirst(FieldKey.ALBUM)
+                }
+
+                if (genre.isBlank() == true) {
+                    genre = tag0.getFirst(FieldKey.GENRE)
+                }
+
+                if (year.isBlank() == true) {
+                    year = tag0.getFirst(FieldKey.YEAR)
+                }
+
+                image = tag0.firstArtwork
+            }
+        }
+        catch (e: Exception) {
+        }
+
         when {
-            File(source).isDirectory == false -> throw Exception("error: missing source directory => '$source'")
             cover.isNotBlank() && File(cover).isImage == false -> throw Exception("error: image cover file is not an valid image")
             artist.isBlank() -> throw Exception("error: artist/author string is empty")
-            title.isBlank() -> throw Exception("error: title string is empty")
-            year != "" && (year.numOrZero < 1 || year.numOrZero > 2100) -> throw Exception("error: year is out of range $year (1 - 2100)")
-            outputFile.isFile == true -> throw Exception("error: destination file '${outputFile.absolutePath}' exist!")
+            album.isBlank() -> throw Exception("error: title string is empty")
+            year != "" && (year.numOrZero < 1 || year.numOrZero > 9999) -> throw Exception("error: year is out of range $year (1 - 9999)")
+        }
+
+        val out_file = FileInfo(outputFileName)
+
+        if (overwrite == Constants.Overwrite.NO && out_file.isFile == true) {
+            throw Exception("error: destination file '${out_file.filename}' exist!")
+        }
+
+
+        if (overwrite == Constants.Overwrite.OLDER) {
+            var count = 0
+
+            for (file in audioFiles) {
+                val in_file  = FileInfo(file.filename)
+                count += if (out_file.mod < in_file.mod) 1 else 0
+
+            }
+
+            if (count == 0) {
+                throw Exception("error: destination file '${out_file.filename}' is newer than the input files!")
+            }
         }
 
         Main.pref.tab1SourcePath = source
@@ -54,5 +108,5 @@ class Tab1Parameters(val source: String, val dest: String, val cover: String, va
     }
 
     //--------------------------------------------------------------------------
-    override fun toString(): String = "source=$source, dest=$dest, cover=$cover, artist=$artist, title=$title, year=$year, comment=$comment, enocder=$encoder"
+    override fun toString(): String = "source=$source, dest=$dest, cover=$cover, artist=$artist, title=$album, year=$year, comment=$comment, enocder=$encoder"
 }

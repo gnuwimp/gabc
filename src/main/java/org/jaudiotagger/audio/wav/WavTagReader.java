@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -79,6 +80,23 @@ public class WavTagReader
                 throw new CannotReadException(loggingName+ " Wav RIFF Header not valid");
             }
         }
+
+        //Ensure we have read audio data chunk okay
+        List<ChunkSummary> chunks =  tag.getChunkSummaryList();
+        boolean isMusicDataFound=false;
+        for(ChunkSummary next:chunks)
+        {
+            if(next.getChunkId().equals(WavChunkType.DATA.getCode()))
+            {
+                isMusicDataFound=true;
+            }
+        }
+
+        if(!isMusicDataFound)
+        {
+            throw new CannotReadException(loggingName+ " Unable to determine audio data");
+        }
+
         createDefaultMetadataTagsIfMissing(tag);
         logger.config(loggingName + " Read Tag:end");
         return tag;

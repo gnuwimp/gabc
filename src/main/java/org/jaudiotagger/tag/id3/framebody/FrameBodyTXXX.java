@@ -63,6 +63,10 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     public static final String ALBUM_ARTISTS                = "ALBUM_ARTISTS";
     public static final String ALBUM_ARTISTS_SORT           = "ALBUM_ARTISTS_SORT";
     public static final String ALBUM_YEAR                   = "ALBUM_YEAR";
+    public static final String AUDIO_ENGINEER               = "AUDIO_ENGINEER";
+    public static final String AUDIO_ENGINEER_SORT          = "AUDIO_ENGINEER_SORT";
+    public static final String BALANCE_ENGINEER             = "BALANCE_ENGINEER";
+    public static final String BALANCE_ENGINEER_SORT        = "BALANCE_ENGINEER_SORT";
     public static final String BARCODE                      = "BARCODE";
     public static final String CATALOG_NO                   = "CATALOGNUMBER";
     public static final String CHOIR                        = "CHOIR";
@@ -71,6 +75,7 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     public static final String CLASSICAL_NICKNAME           = "CLASSICAL_NICKNAME";
     public static final String CONDUCTOR_SORT               = "CONDUCTOR_SORT";
     public static final String COUNTRY                      = "Country";
+    public static final String CREDITS                      = "CREDITS";
     public static final String DJMIXER                      = "DJMIXER";
     public static final String DJMIXER_SORT                 = "DJMIXER_SORT";
     public static final String ENGINEER                     = "ENGINEER";
@@ -89,6 +94,8 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     public static final String JAIKOZ_ID                    = "JAIKOZ_ID";
     public static final String LIVE                         = "LIVE";
     public static final String LYRICIST_SORT                = "LYRICIST_SORT";
+    public static final String MASTERING                    = "MASTERING";
+    public static final String MASTERING_SORT               = "MASTERING_SORT";
     public static final String MIXER                        = "MIXER";
     public static final String MIXER_SORT                   = "MIXER_SORT";
     public static final String MOOD                         = "MOOD";          //ID3 v23 only
@@ -151,6 +158,8 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     public static final String PRODUCER                                 = "PRODUCER";
     public static final String PRODUCER_SORT                            = "PRODUCER_SORT";
     public static final String RANKING                                  = "RANKING";
+    public static final String RECORDING_ENGINEER                       = "RECORDING_ENGINEER";
+    public static final String RECORDING_ENGINEER_SORT                  = "RECORDING_ENGINEER_SORT";
     public static final String RECORDINGDATE                            = "RECORDINGDATE";
     public static final String RECORDINGSTARTDATE                       = "RECORDINGSTARTDATE";
     public static final String RECORDINGENDDATE                         = "RECORDINGENDDATE";
@@ -162,6 +171,8 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     public static final String SECTION                                  = "SECTION";
     public static final String SINGLE_DISC_TRACK_NO                     = "SINGLE_DISC_TRACK_NO";
     public static final String SONGKONG_ID                              = "SONGKONG_ID";
+    public static final String SOUND_ENGINEER                           = "SOUND_ENGINEER";
+    public static final String SOUND_ENGINEER_SORT                      = "SOUND_ENGINEER_SORT";
     public static final String TAGS                                     = "TAGS";
     public static final String TIMBRE                                   = "TIMBRE_BRIGHTNESS";
     public static final String TITLE_MOVEMENT                           = "TITLE_MOVEMENT";
@@ -277,8 +288,7 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     protected void setupObjectList()
     {
         objectList.add(new NumberHashMap(DataTypes.OBJ_TEXT_ENCODING, this, TextEncoding.TEXT_ENCODING_FIELD_SIZE));
-        objectList.add(new TextEncodedStringNullTerminated(DataTypes.OBJ_DESCRIPTION, this));
+        objectList.add(new TextEncodedStringNullTerminated(DataTypes.OBJ_DESCRIPTION, this, false));
         objectList.add(new TextEncodedStringSizeTerminated(DataTypes.OBJ_TEXT, this));
     }
-
 }

@@ -43,6 +43,8 @@ import org.jaudiotagger.tag.reference.Languages;
 import org.jaudiotagger.tag.vorbiscomment.VorbisAlbumArtistReadOptions;
 import org.jaudiotagger.tag.vorbiscomment.VorbisAlbumArtistSaveOptions;
 
+import java.nio.charset.Charset;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -379,6 +381,15 @@ public class TagOptionSingleton
      * Preserve file identity if possible
      */
     private boolean preserveFileIdentity = true;
+
+    private Charset overrideCharset = null;
+
+    private boolean isOverrideCharsetForInfo = false;
+
+    private boolean isOverrideCharsetForId3 = false;
+
+    private EnumSet<FieldKey> overrideCharsetFields = EnumSet.noneOf(FieldKey.class);
+
 
     /**
      * 
@@ -957,6 +968,11 @@ public class TagOptionSingleton
         id3v2Version = ID3V2Version.ID3_V23;
         checkIsWritable = false;
         preserveFileIdentity = true;
+        overrideCharset = null;
+        isOverrideCharsetForInfo = false;
+        isOverrideCharsetForId3 = false;
+        overrideCharsetFields = EnumSet.noneOf(FieldKey.class);
+
         //default all lyrics3 fields to save. id3v1 fields are individual
         // settings. id3v2 fields are always looked at to save.
         Iterator<String> iterator = Lyrics3v2Fields.getInstanceOf().getIdToValueMap().keySet().iterator();
@@ -1417,5 +1433,45 @@ public class TagOptionSingleton
     public void setWriteWavForTwonky(boolean isWriteWavForTwonky)
     {
         this.isWriteWavForTwonky = isWriteWavForTwonky;
+    }
+
+    public Charset getOverrideCharset()
+    {
+        return overrideCharset;
+    }
+
+    public void setOverrideCharset(Charset overrideCharset)
+    {
+        this.overrideCharset = overrideCharset;
+    }
+
+    public boolean isOverrideCharsetForInfo()
+    {
+        return isOverrideCharsetForInfo;
+    }
+
+    public void setOverrideCharsetForInfo(boolean isOverrideCharsetForInfo)
+    {
+        this.isOverrideCharsetForInfo = isOverrideCharsetForInfo;
+    }
+
+    public boolean isOverrideCharsetForId3()
+    {
+        return isOverrideCharsetForId3;
+    }
+
+    public void setOverrideCharsetForId3(boolean isOverrideCharsetForId3)
+    {
+        this.isOverrideCharsetForId3 = isOverrideCharsetForId3;
+    }
+
+    public void addOverrideCharsetFields(FieldKey fieldKey)
+    {
+        overrideCharsetFields.add(fieldKey);
+    }
+
+    public EnumSet<FieldKey> getOverrideCharsetFields()
+    {
+        return overrideCharsetFields;
     }
 }

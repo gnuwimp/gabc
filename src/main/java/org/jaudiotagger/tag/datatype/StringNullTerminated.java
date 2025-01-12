@@ -44,7 +44,7 @@ public class StringNullTerminated extends TextEncodedStringNullTerminated
      */
     public StringNullTerminated(String identifier, AbstractTagFrameBody frameBody)
     {
-        super(identifier, frameBody);
+        super(identifier, frameBody, false);
     }
 
     public StringNullTerminated(StringNullTerminated object)

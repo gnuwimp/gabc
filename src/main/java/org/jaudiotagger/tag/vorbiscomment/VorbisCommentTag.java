@@ -59,10 +59,14 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.AMAZON_ID, VorbisCommentFieldKey.ASIN);
         tagFieldToOggField.put(FieldKey.ARRANGER, VorbisCommentFieldKey.ARRANGER);
         tagFieldToOggField.put(FieldKey.ARRANGER_SORT, VorbisCommentFieldKey.ARRANGER_SORT);
+        tagFieldToOggField.put(FieldKey.AUDIO_ENGINEER, VorbisCommentFieldKey.AUDIO_ENGINEER);
+        tagFieldToOggField.put(FieldKey.AUDIO_ENGINEER_SORT, VorbisCommentFieldKey.AUDIO_ENGINEER_SORT);
         tagFieldToOggField.put(FieldKey.ARTIST, VorbisCommentFieldKey.ARTIST);
         tagFieldToOggField.put(FieldKey.ARTISTS, VorbisCommentFieldKey.ARTISTS);
         tagFieldToOggField.put(FieldKey.ARTISTS_SORT, VorbisCommentFieldKey.ARTISTS_SORT);
         tagFieldToOggField.put(FieldKey.ARTIST_SORT, VorbisCommentFieldKey.ARTISTSORT);
+        tagFieldToOggField.put(FieldKey.BALANCE_ENGINEER, VorbisCommentFieldKey.BALANCE_ENGINEER);
+        tagFieldToOggField.put(FieldKey.BALANCE_ENGINEER_SORT, VorbisCommentFieldKey.BALANCE_ENGINEER_SORT);
         tagFieldToOggField.put(FieldKey.BARCODE, VorbisCommentFieldKey.BARCODE);
         tagFieldToOggField.put(FieldKey.BPM, VorbisCommentFieldKey.BPM);
         tagFieldToOggField.put(FieldKey.CATALOG_NO, VorbisCommentFieldKey.CATALOGNUMBER);
@@ -78,6 +82,7 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.CONDUCTOR_SORT, VorbisCommentFieldKey.CONDUCTOR_SORT);
         tagFieldToOggField.put(FieldKey.COUNTRY, VorbisCommentFieldKey.COUNTRY);
         tagFieldToOggField.put(FieldKey.COVER_ART, VorbisCommentFieldKey.METADATA_BLOCK_PICTURE);
+        tagFieldToOggField.put(FieldKey.CREDITS, VorbisCommentFieldKey.CREDITS);
         tagFieldToOggField.put(FieldKey.CUSTOM1, VorbisCommentFieldKey.CUSTOM1);
         tagFieldToOggField.put(FieldKey.CUSTOM2, VorbisCommentFieldKey.CUSTOM2);
         tagFieldToOggField.put(FieldKey.CUSTOM3, VorbisCommentFieldKey.CUSTOM3);
@@ -114,6 +119,8 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.LYRICIST, VorbisCommentFieldKey.LYRICIST);
         tagFieldToOggField.put(FieldKey.LYRICIST_SORT, VorbisCommentFieldKey.LYRICIST_SORT);
         tagFieldToOggField.put(FieldKey.LYRICS, VorbisCommentFieldKey.LYRICS);
+        tagFieldToOggField.put(FieldKey.MASTERING, VorbisCommentFieldKey.MASTERING);
+        tagFieldToOggField.put(FieldKey.MASTERING_SORT, VorbisCommentFieldKey.MASTERING_SORT);
         tagFieldToOggField.put(FieldKey.MEDIA, VorbisCommentFieldKey.MEDIA);
         tagFieldToOggField.put(FieldKey.MIXER, VorbisCommentFieldKey.MIXER);
         tagFieldToOggField.put(FieldKey.MIXER_SORT, VorbisCommentFieldKey.MIXER_SORT);
@@ -189,6 +196,8 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.RANKING, VorbisCommentFieldKey.RANKING);
         tagFieldToOggField.put(FieldKey.RATING, VorbisCommentFieldKey.RATING);
         tagFieldToOggField.put(FieldKey.RECORD_LABEL, VorbisCommentFieldKey.LABEL);
+        tagFieldToOggField.put(FieldKey.RECORDING_ENGINEER, VorbisCommentFieldKey.RECORDING_ENGINEER);
+        tagFieldToOggField.put(FieldKey.RECORDING_ENGINEER_SORT, VorbisCommentFieldKey.RECORDING_ENGINEER_SORT);
         tagFieldToOggField.put(FieldKey.RECORDINGLOCATION, VorbisCommentFieldKey.RECORDINGLOCATION);
         tagFieldToOggField.put(FieldKey.RECORDINGDATE, VorbisCommentFieldKey.RECORDINGDATE);
         tagFieldToOggField.put(FieldKey.RECORDINGSTARTDATE, VorbisCommentFieldKey.RECORDINGSTARTDATE);
@@ -200,6 +209,8 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.SECTION, VorbisCommentFieldKey.SECTION);
         tagFieldToOggField.put(FieldKey.SINGLE_DISC_TRACK_NO, VorbisCommentFieldKey.SINGLE_DISC_TRACK_NO);
         tagFieldToOggField.put(FieldKey.SONGKONG_ID, VorbisCommentFieldKey.SONGKONG_ID);
+        tagFieldToOggField.put(FieldKey.SOUND_ENGINEER, VorbisCommentFieldKey.SOUND_ENGINEER);
+        tagFieldToOggField.put(FieldKey.SOUND_ENGINEER_SORT, VorbisCommentFieldKey.SOUND_ENGINEER_SORT);
         tagFieldToOggField.put(FieldKey.SUBTITLE, VorbisCommentFieldKey.SUBTITLE);
         tagFieldToOggField.put(FieldKey.TAGS, VorbisCommentFieldKey.TAGS);
         tagFieldToOggField.put(FieldKey.TEMPO, VorbisCommentFieldKey.TEMPO);
@@ -210,6 +221,8 @@ public class VorbisCommentTag extends AbstractTag
         tagFieldToOggField.put(FieldKey.TONALITY, VorbisCommentFieldKey.TONALITY);
         tagFieldToOggField.put(FieldKey.TRACK, VorbisCommentFieldKey.TRACKNUMBER);
         tagFieldToOggField.put(FieldKey.TRACK_TOTAL, VorbisCommentFieldKey.TRACKTOTAL);
+        tagFieldToOggField.put(FieldKey.URL_BANDCAMP_ARTIST_SITE, VorbisCommentFieldKey.URL_BANDCAMP_ARTIST_SITE);
+        tagFieldToOggField.put(FieldKey.URL_BANDCAMP_RELEASE_SITE, VorbisCommentFieldKey.URL_BANDCAMP_RELEASE_SITE);
         tagFieldToOggField.put(FieldKey.URL_DISCOGS_ARTIST_SITE, VorbisCommentFieldKey.URL_DISCOGS_ARTIST_SITE);
         tagFieldToOggField.put(FieldKey.URL_DISCOGS_RELEASE_SITE, VorbisCommentFieldKey.URL_DISCOGS_RELEASE_SITE);
         tagFieldToOggField.put(FieldKey.URL_LYRICS_SITE, VorbisCommentFieldKey.URL_LYRICS_SITE);

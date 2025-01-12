@@ -66,13 +66,13 @@ public class WavListChunk extends Chunk
             tag.getInfoTag().setStartLocationInFile(chunkHeader.getStartLocationInFile());
             tag.getInfoTag().setEndLocationInFile(chunkHeader.getStartLocationInFile() + ChunkHeader.CHUNK_HEADER_SIZE + chunkHeader.getSize());
             tag.setExistingInfoTag(true);
+            return result;
         }
         else
         {
             logger.severe("LIST chunk does not contain INFO instead contains "+subIdentifier + " so skipping");
-            result=true;
+            return true;
         }
-        return result;
     }
 
 

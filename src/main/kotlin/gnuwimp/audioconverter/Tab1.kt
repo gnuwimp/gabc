@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2024 gnuwimp@gmail.com
+ * Copyright 2021 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -16,36 +16,38 @@ import javax.swing.*
 //------------------------------------------------------------------------------
 @Suppress("UNUSED_VALUE")
 class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
-    private val sourceLabel   = JLabel("Source:")
-    private val sourceInput   = JTextField()
-    private val sourceButton  = JButton("Browse")
-    private val destLabel     = JLabel("Destination:")
-    private val destInput     = JTextField()
-    private val destButton    = JButton("Browse")
-    private val imageLabel    = JLabel("Cover Image:")
-    private val imageInput    = JTextField()
-    private val imageButton   = JButton("Browse")
-    private val authorLabel   = JLabel("Artist")
-    private val authorInput   = JTextField()
-    private val titleLabel    = JLabel("Title:")
-    private val titleInput    = JTextField()
-    private val commentLabel  = JLabel("Comment:")
-    private val commentInput  = JTextField()
-    private val yearLabel     = JLabel("Year:")
-    private val yearInput     = JTextField()
-    private val genreLabel    = JLabel("Genre:")
-    private val genreInput    = JTextField()
-    private val encoderLabel  = JLabel("Encoder:")
-    private val encoderCombo  = ComboBox<String>(strings = Encoders.toNames, Encoders.DEFAULT.encoderIndex)
-    private val gapLabel      = JLabel("Gap:")
-    private val gapCombo      = ComboBox<String>(strings = listOf("0", "1", "2", "3", "4", "5"), 0)
-    private val channelLabel  = JLabel("Channels:")
-    private val channelGroup  = ButtonGroup()
-    private val channelMono   = JRadioButton("Mono")
-    private val channelStereo = JRadioButton("Stereo")
-    private val helpButton    = JButton("Help")
-    private val convertButton = JButton("Convert")
-    var         auto          = 0
+    private val sourceLabel    = JLabel("Source:")
+    private val sourceInput    = JTextField()
+    private val sourceButton   = JButton("Browse")
+    private val destLabel      = JLabel("Destination:")
+    private val destInput      = JTextField()
+    private val destButton     = JButton("Browse")
+    private val imageLabel     = JLabel("Cover Image:")
+    private val imageInput     = JTextField()
+    private val imageButton    = JButton("Browse")
+    private val authorLabel    = JLabel("Artist")
+    private val authorInput    = JTextField()
+    private val titleLabel     = JLabel("Title:")
+    private val titleInput     = JTextField()
+    private val commentLabel   = JLabel("Comment:")
+    private val commentInput   = JTextField()
+    private val yearLabel      = JLabel("Year:")
+    private val yearInput      = JTextField()
+    private val genreLabel     = JLabel("Genre:")
+    private val genreInput     = JTextField()
+    private val encoderLabel   = JLabel("Encoder:")
+    private val encoderCombo   = ComboBox<String>(strings = Encoders.toNames, Encoders.DEFAULT.encoderIndex)
+    private val gapLabel       = JLabel("Gap:")
+    private val gapCombo       = ComboBox<String>(strings = listOf("0", "1", "2", "3", "4", "5"), 0)
+    private val channelLabel   = JLabel("Channels:")
+    private val channelGroup   = ButtonGroup()
+    private val channelMono    = JRadioButton("Mono")
+    private val channelStereo  = JRadioButton("Stereo")
+    private val overwriteLabel = JLabel("Overwrite:")
+    private val overwriteCombo = ComboBox<String>(strings = listOf("Don't overwrite existing files", "Overwrite older files", "Overwrite all"), 0)
+    private val helpButton     = JButton("Help")
+    private val convertButton  = JButton("Convert")
+    var         auto           = Constants.Auto.NO
 
     //--------------------------------------------------------------------------
     init {
@@ -100,6 +102,10 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         add(channelLabel, x = 1, y = y, w = w, h = 4)
         add(channelMono, x = w + 2, y = y, w = 15, h = 4)
         add(channelStereo, x = w + 17, y = y, w = 15, h = 4)
+
+        y += 5
+        add(overwriteLabel, x = 1, y = y, w = w, h = 4)
+        add(overwriteCombo, x = w + 2, y = y, w = 30, h = 4)
 
         channelGroup.add(channelMono)
         channelGroup.add(channelStereo)
@@ -177,24 +183,26 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     //--------------------------------------------------------------------------
     fun argLoad(args: Array<String>): Boolean {
         try {
-            val src     = args.findString("--src", "")
-            val dest    = args.findString("--dest", "")
-            val cover   = args.findString("--cover", "")
-            val author  = args.findString("--author", "")
-            val artist  = args.findString("--artist", "")
-            val title   = args.findString("--title", "")
-            val comment = args.findString("--comment", "")
-            val year    = args.findString("--year", "")
-            val genre   = args.findString("--genre", Tab1Parameters.DEFAULT_GENRE)
-            val gap     = args.findInt("--gap", 0).toInt()
-            val mono    = args.find("--mono") != -1
-            val encoder = args.findInt("--encoder", Encoders.DEFAULT.encoderIndex.toLong()).toInt()
+            val src        = args.findString("--src", "")
+            val dest       = args.findString("--dest", "")
+            val cover      = args.findString("--cover", "")
+            val author     = args.findString("--author", "")
+            val artist     = args.findString("--artist", "")
+            val title      = args.findString("--title", "")
+            val comment    = args.findString("--comment", "")
+            val year       = args.findString("--year", "")
+            val genre      = args.findString("--genre", "")
+            val gap        = args.findInt("--gap", 0).toInt()
+            val mono       = args.find("--mono") != -1
+            val encoder    = args.findInt("--encoder", Encoders.DEFAULT.encoderIndex.toLong()).toInt()
+            val overwrite  = args.findString("--overwrite", "0")
+            var overwrite2 = overwrite
 
             if (args.find("--auto2") != -1) {
-                auto = 2
+                auto = Constants.Auto.YES_QUIT_ON_ERROR
             }
             else if (args.find("--auto") != -1) {
-                auto = 1
+                auto = Constants.Auto.YES_STOP_ON_ERROR
             }
 
             if (src != "") {
@@ -245,10 +253,22 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
                 gapCombo.selectedIndex = gap
             }
 
+            for ((index, choice) in Constants.TAB2_OVERWRITE.withIndex()) {
+                if (overwrite == choice) {
+                    overwriteCombo.selectedIndex = index
+                    overwrite2 = ""
+                    break
+                }
+            }
+
+            if (overwrite2 != "") {
+                throw Exception("error: invalid value for --overwrite ($overwrite)")
+            }
+
             return true
         }
         catch (e: Exception) {
-            if (auto == 2) {
+            if (auto == Constants.Auto.YES_QUIT_ON_ERROR) {
                 println(e.message)
                 Main.window.quit()
             }
@@ -261,22 +281,45 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     }
 
     //--------------------------------------------------------------------------
-//    private fun formatProgress(num: Long) = if (num < 1_000_000_000) "Decoded total ${num / 1_000_000} MB\n${Tab1.work}" else "Decoded total %.2f GB\n${Tab1.work}".format(num.toFloat() / 1_000_000_000.0)
+    private fun stage1LoadFiles(): List<FileInfo> {
+        if (File(sourceInput.text).isDirectory == false) {
+            Exception("error: missing source directory => '{sourceInput.text}'")
+        }
+
+        val files = FileInfo(sourceInput.text).readDir(FileInfo.ReadDirOption.FILES_ONLY_IN_START_DIRECTORY)
+        var audioFiles: List<FileInfo> = listOf()
+
+        audioFiles = files.filter {
+            it.isAudioFile
+        }
+
+        if (audioFiles.isEmpty() == true) {
+            throw Exception("error: no audio/video files in source directory")
+        }
+
+        audioFiles = audioFiles.sortedBy {
+            it.filename
+        }
+
+        return audioFiles
+    }
 
     //--------------------------------------------------------------------------
-    private fun stage1SetParameters() : Tab1Parameters {
+    private fun stage2SetParameters(files: List<FileInfo>) : Tab1Parameters {
         val parameters = Tab1Parameters(
-            source      = sourceInput.text,
-            dest        = destInput.text,
-            cover       = imageInput.text,
-            artist      = authorInput.text,
-            title       = titleInput.text,
-            year        = yearInput.text,
-            comment     = commentInput.text,
-            genre       = genreInput.text,
-            encoder     = Encoders.toEncoder(encoderCombo.selectedIndex),
-            gap         = gapCombo.text,
-            mono        = channelMono.isSelected,
+            audioFiles = files,
+            source     = sourceInput.text,
+            dest       = destInput.text,
+            cover      = imageInput.text,
+            artist     = authorInput.text,
+            album      = titleInput.text,
+            year       = yearInput.text,
+            comment    = commentInput.text,
+            genre      = genreInput.text,
+            encoder    = Encoders.toEncoder(encoderCombo.selectedIndex),
+            gap        = gapCombo.text,
+            mono       = channelMono.isSelected,
+            overwrite  = if (overwriteCombo.selectedIndex == 1) Constants.Overwrite.OLDER else if (overwriteCombo.selectedIndex == 2) Constants.Overwrite.ALL else Constants.Overwrite.NO
         )
 
         parameters.validate()
@@ -284,26 +327,9 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     }
 
     //--------------------------------------------------------------------------
-    private fun stage2LoadFiles(parameters: Tab1Parameters) {
-        val files = FileInfo(parameters.source).readDir(FileInfo.ReadDirOption.FILES_ONLY_IN_START_DIRECTORY)
-
-        parameters.audioFiles = files.filter {
-            it.isAudioFile
-        }
-
-        if (parameters.audioFiles.isEmpty() == true) {
-            throw Exception("error: no audio/video files in source directory")
-        }
-
-        parameters.audioFiles = parameters.audioFiles.sortedBy {
-            it.filename
-        }
-    }
-
-    //--------------------------------------------------------------------------
     private fun stage3Convert(parameters: Tab1Parameters) {
         val tasks    = mutableListOf<Task>(Tab1Task(parameters = parameters))
-        val progress = ConvertManager(tasks = tasks, threadCount = 1, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
+        val progress = ConvertManager(tasks = tasks, maxThreads = 1, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
         val dialog   = TaskDialog(taskManager = progress, title = "Converting Files", type = TaskDialog.Type.PERCENT, parent = Main.window)
 
         dialog.enableCancel = true
@@ -318,13 +344,13 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
             val track = AudioFileIO.read(parameters.outputFile)
             val tag   = track.tagOrCreateDefault
 
-            tag.setField(FieldKey.ALBUM, parameters.title)
+            tag.setField(FieldKey.ALBUM, parameters.album)
             tag.setField(FieldKey.ALBUM_ARTIST, parameters.artist)
             tag.setField(FieldKey.ARTIST, parameters.artist)
             tag.setField(FieldKey.COMMENT, parameters.comment)
-            tag.setField(FieldKey.ENCODER, parameters.encoder.encoderExe)
-            tag.setField(FieldKey.GENRE, parameters.genre)
-            tag.setField(FieldKey.TITLE, parameters.title)
+            tag.setField(FieldKey.ENCODER, parameters.encoder.executable)
+            tag.setField(FieldKey.GENRE, if (parameters.genre.isBlank() == true) Tab1Parameters.DEFAULT_GENRE else parameters.genre)
+            tag.setField(FieldKey.TITLE, parameters.album)
             tag.setField(FieldKey.TRACK, "1")
             tag.setField(FieldKey.TRACK_TOTAL, "1")
 
@@ -334,6 +360,9 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
             if (parameters.cover.isNotBlank() == true) {
                 tag.addField(StandardArtwork.createArtworkFromFile(File(parameters.cover)))
+            }
+            else if (parameters.image != null) {
+                tag.addField(parameters.image)
             }
 
             track.tag = tag
@@ -352,9 +381,9 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         Swing.errorMessage = ""
 
         try {
-            val parameters = stage1SetParameters()
+            val files = stage1LoadFiles()
+            val parameters = stage2SetParameters(files)
             file = parameters.outputFile
-            stage2LoadFiles(parameters)
             stage3Convert(parameters)
             file = null
             stage4WriteTags(parameters)
@@ -368,7 +397,7 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
             Swing.logMessage = message
 
-            if (auto != 0) {
+            if (auto != Constants.Auto.NO) {
                 Main.window.quit()
             }
             else {
@@ -380,7 +409,7 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
                 file.remove()
             }
 
-            if (auto == 2) {
+            if (auto == Constants.Auto.YES_QUIT_ON_ERROR) {
                 println("${e.message}")
                 Main.window.quit()
             }

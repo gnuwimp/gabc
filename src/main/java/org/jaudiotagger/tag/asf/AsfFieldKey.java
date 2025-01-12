@@ -3,7 +3,6 @@ package org.jaudiotagger.tag.asf;
 import org.jaudiotagger.audio.asf.data.ContainerType;
 import org.jaudiotagger.audio.asf.data.ContentBranding;
 import org.jaudiotagger.audio.asf.data.ContentDescription;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,20 +39,20 @@ public enum AsfFieldKey
     /*
      * Keys are arbitrary because these fields don't have 'keys' internally because they are stored in preset contents descriptor
      */
-
+    
     // Content Description Object keys
     AUTHOR(ContentDescription.KEY_AUTHOR, false, ContainerType.CONTENT_DESCRIPTION),
     TITLE(ContentDescription.KEY_TITLE, false, ContainerType.CONTENT_DESCRIPTION),
     RATING(ContentDescription.KEY_RATING, false, ContainerType.CONTENT_DESCRIPTION),
     COPYRIGHT(ContentDescription.KEY_COPYRIGHT, false, ContainerType.CONTENT_DESCRIPTION),
     DESCRIPTION(ContentDescription.KEY_DESCRIPTION, false, ContainerType.CONTENT_DESCRIPTION),
-
+    
     // Content Branding Object keys
     BANNER_IMAGE(ContentBranding.KEY_BANNER_IMAGE,false, ContainerType.CONTENT_BRANDING),
     BANNER_IMAGE_TYPE(ContentBranding.KEY_BANNER_TYPE,false, ContainerType.CONTENT_BRANDING),
     BANNER_IMAGE_URL(ContentBranding.KEY_BANNER_URL, false, ContainerType.CONTENT_BRANDING),
     COPYRIGHT_URL(ContentBranding.KEY_COPYRIGHT_URL, false, ContainerType.CONTENT_BRANDING),
-
+    
     /*
      * keys are important because this is how values will be looked up by other applications
      */
@@ -74,6 +73,10 @@ public enum AsfFieldKey
     ARTISTS("WM/ARTISTS", true),
     ARTISTS_SORT("WM/ARTISTS_SORT",true),
     ARTIST_SORT("WM/ArtistSortOrder", false),
+    AUDIO_ENGINEER("AUDIO_ENGINEER",true),
+    AUDIO_ENGINEER_SORT("AUDIO_ENGINEER_SORT",true),
+    BALANCE_ENGINEER("BALANCE_ENGINEER",true),
+    BALANCE_ENGINEER_SORT("BALANCE_ENGINEER_SORT",true),
     BARCODE("WM/Barcode", false),
     BPM("WM/BeatsPerMinute", false),
     CATALOG_NO("WM/CatalogNo", false),
@@ -89,6 +92,7 @@ public enum AsfFieldKey
     COUNTRY("WM/Country", false),
     COVER_ART("WM/Picture", true),
     COVER_ART_URL("WM/AlbumCoverURL", true),
+    CREDITS("CREDITS", true),
     CUSTOM1("CUSTOM1", true),
     CUSTOM2("CUSTOM2", true),
     CUSTOM3("CUSTOM3", true),
@@ -130,6 +134,8 @@ public enum AsfFieldKey
     LYRICIST_SORT("LYRICIST_SORT", true),
     LYRICS("WM/Lyrics", false),
     LYRICS_SYNCHRONISED("WM/Lyrics_Synchronised", true),
+    MASTERING("MASTERING",true),
+    MASTERING_SORT("MASTERING_SORT",true),
     MEDIA("WM/Media", false),
     MIXER("WM/Mixer",false),
     MIXER_SORT("MIXER_SORT",false),
@@ -204,6 +210,8 @@ public enum AsfFieldKey
     QUALITY("Quality", true),
     RANKING("RANKING", true),
     RECORD_LABEL("WM/Publisher", false),
+    RECORDING_ENGINEER("RECORDING_ENGINEER",true),
+    RECORDING_ENGINEER_SORT("RECORDING_ENGINEER_SORT",true),
     RECORDINGDATE("RECORDINGDATE", false),
     RECORDINGSTARTDATE("RECORDINGSTARTDATE", false),
     RECORDINGENDDATE("RECORDINGENDDATE", false),
@@ -215,6 +223,8 @@ public enum AsfFieldKey
     SECTION("SECTION", false),
     SINGLE_DISC_TRACK_NO("SINGLE_DISC_TRACK_NO",true),
     SONGKONG_ID("SONGKONG_ID", false),
+    SOUND_ENGINEER("SOUND_ENGINEER",true),
+    SOUND_ENGINEER_SORT("SOUND_ENGINEER_SORT",true),
     SUBTITLE("WM/SubTitle", false),
     TAGS("WM/Tags", false),
     TEMPO("Tempo", true),
@@ -225,6 +235,8 @@ public enum AsfFieldKey
     TONALITY("TONALITY", false),
     TRACK("WM/TrackNumber", false),
     TRACK_TOTAL("WM/TrackTotal", false),
+    URL_BANDCAMP_ARTIST_SITE("WM/BandcampArtistUrl", false),
+    URL_BANDCAMP_RELEASE_SITE("WM/BandcampReleaseUrl", false),
     URL_DISCOGS_ARTIST_SITE("WM/DiscogsArtistUrl", false),
     URL_DISCOGS_RELEASE_SITE("WM/DiscogsReleaseUrl", false),
     URL_LYRICS_SITE("WM/LyricsUrl", false),
@@ -304,19 +316,19 @@ public enum AsfFieldKey
      * Low means, container with least capabilities.
      */
     private final ContainerType lowestContainer;
-
+    
     /**
      * The highest possible container type, such a field can be stored into.<br>
      * High means, most capabilities, for example string length exceeds that of
      * the extended content description, it will be stored one level up (metadata library).
      */
     private final ContainerType highestContainer;
-
+    
     /**
      * Creates an instance<br>
      * Lowest/Highest will be {@link ContainerType#EXTENDED_CONTENT} /
      * {@link ContainerType#METADATA_LIBRARY_OBJECT}
-     *
+     * 
      * @param asfFieldName
      *            standard field identifier.
      * @param multiValue
@@ -327,13 +339,13 @@ public enum AsfFieldKey
         this(asfFieldName, multiValue, ContainerType.EXTENDED_CONTENT,
                 ContainerType.METADATA_LIBRARY_OBJECT);
     }
-
+    
     /**
      * Creates an instance.<br>
-     *
+     * 
      * @param asfFieldName
      *              standard field identifier.
-     * @param multiValue
+     * @param multiValue           
      *              <code>true</code> if the this ASF field can have multiple
      *              values.
      * @param restrictedTo
@@ -346,10 +358,10 @@ public enum AsfFieldKey
 
     /**
      * Creates an instance.<br>
-     *
+     * 
      * @param asfFieldName
      *              standard field identifier.
-     * @param multiValue
+     * @param multiValue           
      *              <code>true</code> if the this ASF field can have multiple
      *              values.
      * @param lowest
@@ -385,14 +397,14 @@ public enum AsfFieldKey
     public ContainerType getHighestContainer() {
         return this.highestContainer;
     }
-
+    
     /**
      * @return the lowestContainer
      */
     public ContainerType getLowestContainer() {
         return this.lowestContainer;
     }
-
+    
     /**
      * Returns <code>true</code> if this field can store multiple values.
      *
@@ -402,7 +414,7 @@ public enum AsfFieldKey
     {
         return this.multiValued;
     }
-
+    
     /**
      * {@inheritDoc}
      */

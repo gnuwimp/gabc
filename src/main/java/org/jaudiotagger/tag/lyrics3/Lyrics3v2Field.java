@@ -23,6 +23,13 @@
 
 package org.jaudiotagger.tag.lyrics3;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jaudiotagger.tag.InvalidTagException;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.TagOptionSingleton;
@@ -32,13 +39,6 @@ import org.jaudiotagger.tag.id3.framebody.AbstractFrameBodyTextInfo;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyCOMM;
 import org.jaudiotagger.tag.id3.framebody.FrameBodySYLT;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyUSLT;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 
 public class Lyrics3v2Field extends AbstractTagFrame
@@ -64,9 +64,9 @@ public class Lyrics3v2Field extends AbstractTagFrame
     {
         this.frameBody = body;
     }
-
+    
     protected static Set<String> LYRICS_FRAME_IDS;
-    static
+    static 
     {
     	Set<String> lyricsFrameIds = new HashSet<>();
     	lyricsFrameIds.add("USLT");
@@ -78,7 +78,7 @@ public class Lyrics3v2Field extends AbstractTagFrame
     	lyricsFrameIds.add("TIT2");
     	LYRICS_FRAME_IDS = Collections.unmodifiableSet(lyricsFrameIds);
     }
-    public static boolean isLyrics3v2Field(AbstractID3v2Frame frame)
+    public static boolean isLyrics3v2Field(AbstractID3v2Frame frame) 
     {
     	String frameIdentifier = frame.getIdentifier();
     	return LYRICS_FRAME_IDS.contains(frameIdentifier);

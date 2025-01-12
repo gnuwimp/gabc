@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 - 2024 gnuwimp@gmail.com
+ * Copyright 2021 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -13,19 +13,21 @@ import javax.swing.*
 //------------------------------------------------------------------------------
 @Suppress("UNUSED_VALUE")
 class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
-    private val sourceLabel   = JLabel("Source:")
-    private val sourceInput   = JTextField()
-    private val sourceButton  = JButton("Browse")
-    private val destLabel     = JLabel("Destination:")
-    private val destInput     = JTextField()
-    private val destButton    = JButton("Browse")
-    private val encoderLabel  = JLabel("Encoder:")
-    private val encoderCombo  = ComboBox<String>(strings = Encoders.toNames, Encoders.DEFAULT.encoderIndex)
-    private val threadsLabel  = JLabel("Threads:")
-    private val threadsCombo  = ComboBox<String>(strings = Constants.TAB2_THREADS, 0)
-    private val helpButton    = JButton("Help")
-    private val convertButton = JButton("Convert")
-    var         auto          = 0
+    private val sourceLabel    = JLabel("Source:")
+    private val sourceInput    = JTextField()
+    private val sourceButton   = JButton("Browse")
+    private val destLabel      = JLabel("Destination:")
+    private val destInput      = JTextField()
+    private val destButton     = JButton("Browse")
+    private val encoderLabel   = JLabel("Encoder:")
+    private val encoderCombo   = ComboBox<String>(strings = Encoders.toNames, Encoders.DEFAULT.encoderIndex)
+    private val threadsLabel   = JLabel("Threads:")
+    private val threadsCombo   = ComboBox<String>(strings = Constants.TAB2_THREADS, 0)
+    private val overwriteLabel = JLabel("Overwrite:")
+    private val overwriteCombo = ComboBox<String>(strings = listOf("Don't overwrite existing files", "Overwrite older files", "Overwrite all"), 0)
+    private val helpButton     = JButton("Help")
+    private val convertButton  = JButton("Convert")
+    var         auto           = Constants.Auto.NO
 
     //--------------------------------------------------------------------------
     init {
@@ -50,6 +52,10 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         add(threadsLabel, x = 1, y = y, w = w, h = 4)
         add(threadsCombo, x = w + 2, y = y, w = 30, h = 4)
         add(convertButton, x = -20, y = y, w = -1, h = 4)
+
+        y += 5
+        add(overwriteLabel, x = 1, y = y, w = w, h = 4)
+        add(overwriteCombo, x = w + 2, y = y, w = 30, h = 4)
 
         sourceInput.toolTipText    = Constants.TAB2_STARTINPUT_TOOLTIP
         destInput.toolTipText     = Constants.TAB2_DESTINPUT_TOOLTIP
@@ -100,17 +106,19 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     //--------------------------------------------------------------------------
     fun argLoad(args: Array<String>): Boolean {
         try {
-            val start    = args.findString("--src", "")
-            val dest     = args.findString("--dest", "")
-            val encoder  = args.findInt("--encoder", Encoders.DEFAULT.encoderIndex.toLong()).toInt()
-            val threads  = args.findString("--threads", "1")
-            var threads2 = threads
+            val start      = args.findString("--src", "")
+            val dest       = args.findString("--dest", "")
+            val encoder    = args.findInt("--encoder", Encoders.DEFAULT.encoderIndex.toLong()).toInt()
+            val threads    = args.findString("--threads", "1")
+            var threads2   = threads
+            val overwrite  = args.findString("--overwrite", "0")
+            var overwrite2 = overwrite
 
             if (args.find("--auto2") != -1) {
-                auto = 2
+                auto = Constants.Auto.YES_QUIT_ON_ERROR
             }
             else if (args.find("--auto") != -1) {
-                auto = 1
+                auto = Constants.Auto.YES_STOP_ON_ERROR
             }
 
             if (start != "") {
@@ -135,10 +143,22 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
                 throw Exception("error: invalid value for --threads ($threads)")
             }
 
+            for ((index, choice) in Constants.TAB2_OVERWRITE.withIndex()) {
+                if (overwrite == choice) {
+                    overwriteCombo.selectedIndex = index
+                    overwrite2 = ""
+                    break
+                }
+            }
+
+            if (overwrite2 != "") {
+                throw Exception("error: invalid value for --overwrite ($overwrite)")
+            }
+
             return true
         }
         catch (e: Exception) {
-            if (auto == 2) {
+            if (auto == Constants.Auto.YES_QUIT_ON_ERROR) {
                 println(e.message)
                 Main.window.quit()
             }
@@ -153,10 +173,11 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
     //--------------------------------------------------------------------------
     private fun stage1SetParameters() : Tab2Parameters {
         val parameters = Tab2Parameters(
-            source   = sourceInput.text,
-            dest    = destInput.text,
-            encoder = Encoders.toEncoder(encoderCombo.selectedIndex),
-            threads = threadsCombo.text.toInt(),
+            source    = sourceInput.text,
+            dest      = destInput.text,
+            encoder   = Encoders.toEncoder(encoderCombo.selectedIndex),
+            threads   = threadsCombo.text.toInt(),
+            overwrite = if (overwriteCombo.selectedIndex == 1) Constants.Overwrite.OLDER else if (overwriteCombo.selectedIndex == 2) Constants.Overwrite.ALL else Constants.Overwrite.NO
         )
 
         parameters.validate()
@@ -208,9 +229,18 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         val outfiles = mutableMapOf<String, Boolean>()
 
         for (index in parameters.inputFiles.indices) {
+            val infile  = parameters.inputFiles[index]
             val outfile = parameters.outputFiles[index]
 
             if (outfile.isMissing == true && outfiles[outfile.filename] == null) {
+                outfiles[outfile.filename] = true
+                tasks.add(Tab2Task(parameters.inputFiles[index], outfile, parameters))
+            }
+            else if (parameters.overwrite == Constants.Overwrite.OLDER && outfile.mod < infile.mod) {
+                outfiles[outfile.filename] = true
+                tasks.add(Tab2Task(parameters.inputFiles[index], outfile, parameters))
+            }
+            else if (parameters.overwrite == Constants.Overwrite.ALL) {
                 outfiles[outfile.filename] = true
                 tasks.add(Tab2Task(parameters.inputFiles[index], outfile, parameters))
             }
@@ -225,12 +255,12 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
     //--------------------------------------------------------------------------
     private fun stage5Transcoding(parameters: Tab2Parameters, tasks: List<Task>) {
-        val progress = ConvertManager(tasks = tasks, threadCount = parameters.threads, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
-        val dialog   = TaskDialog(taskManager = progress, title = "Converting Files", type = TaskDialog.Type.PERCENT, parent = Main.window)
+        val progress = ConvertManager(tasks = tasks, maxThreads = parameters.threads, onError = TaskManager.Execution.STOP_JOIN, onCancel = TaskManager.Execution.STOP_JOIN)
+        val dialog   = TaskDialog(taskManager = progress, title = "Converting Files", type = TaskDialog.Type.PERCENT, parent = Main.window, height = Swing.defFont.size * 26)
 
         dialog.enableCancel = true
         ConvertManager.clear()
-        dialog.start(updateTime = 200L)
+        dialog.start(updateTime = 200L, messages = parameters.threads + 1)
         tasks.throwFirstError()
     }
 
@@ -255,7 +285,7 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
 
             Swing.logMessage = message
 
-            if (auto != 0) {
+            if (auto != Constants.Auto.NO) {
                 Main.window.quit()
             }
             else {
@@ -263,7 +293,7 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
             }
         }
         catch (e: Exception) {
-            if (auto == 2) {
+            if (auto == Constants.Auto.YES_QUIT_ON_ERROR) {
                 println("${e.message}")
                 Main.window.quit()
             }

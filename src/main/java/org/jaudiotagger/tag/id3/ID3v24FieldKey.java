@@ -6,6 +6,9 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyUFID;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyWXXX;
 import org.jaudiotagger.tag.id3.valuepair.StandardIPLSKey;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * List of known id3v24 metadata fields
  *
@@ -32,6 +35,10 @@ public enum ID3v24FieldKey
     ARTISTS(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.ARTISTS, Id3FieldType.TEXT),
     ARTISTS_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.ARTISTS_SORT, Id3FieldType.TEXT),
     ARTIST_SORT(ID3v24Frames.FRAME_ID_ARTIST_SORT_ORDER, Id3FieldType.TEXT),
+    AUDIO_ENGINEER(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.AUDIO_ENGINEER, Id3FieldType.TEXT),
+    AUDIO_ENGINEER_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.AUDIO_ENGINEER_SORT, Id3FieldType.TEXT),
+    BALANCE_ENGINEER(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.BALANCE_ENGINEER, Id3FieldType.TEXT),
+    BALANCE_ENGINEER_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.BALANCE_ENGINEER_SORT, Id3FieldType.TEXT),
     BARCODE(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.BARCODE, Id3FieldType.TEXT),
     BPM(ID3v24Frames.FRAME_ID_BPM, Id3FieldType.TEXT),
     CATALOG_NO(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.CATALOG_NO, Id3FieldType.TEXT),
@@ -47,6 +54,7 @@ public enum ID3v24FieldKey
     COPYRIGHT(ID3v24Frames.FRAME_ID_COPYRIGHTINFO, Id3FieldType.TEXT),
     COUNTRY(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.COUNTRY, Id3FieldType.TEXT),
     COVER_ART(ID3v24Frames.FRAME_ID_ATTACHED_PICTURE, Id3FieldType.BINARY),
+    CREDITS(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.CREDITS, Id3FieldType.TEXT),
     CUSTOM1(ID3v24Frames.FRAME_ID_COMMENT, FrameBodyCOMM.MM_CUSTOM1,Id3FieldType.TEXT),
     CUSTOM2(ID3v24Frames.FRAME_ID_COMMENT, FrameBodyCOMM.MM_CUSTOM2,Id3FieldType.TEXT),
     CUSTOM3(ID3v24Frames.FRAME_ID_COMMENT, FrameBodyCOMM.MM_CUSTOM3,Id3FieldType.TEXT),
@@ -86,6 +94,8 @@ public enum ID3v24FieldKey
     LYRICIST(ID3v24Frames.FRAME_ID_LYRICIST, Id3FieldType.TEXT),
     LYRICIST_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.LYRICIST_SORT, Id3FieldType.TEXT),
     LYRICS(ID3v24Frames.FRAME_ID_UNSYNC_LYRICS, Id3FieldType.TEXT),
+    MASTERING(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.MASTERING, Id3FieldType.TEXT),
+    MASTERING_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.MASTERING_SORT, Id3FieldType.TEXT),
     MEDIA(ID3v24Frames.FRAME_ID_MEDIA_TYPE, Id3FieldType.TEXT),
     MIXER(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.MIXER, Id3FieldType.TEXT),
     MIXER_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.MIXER_SORT, Id3FieldType.TEXT),
@@ -150,6 +160,8 @@ public enum ID3v24FieldKey
     RANKING(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RANKING, Id3FieldType.TEXT),
     RATING(ID3v24Frames.FRAME_ID_POPULARIMETER, Id3FieldType.TEXT),
     RECORD_LABEL(ID3v24Frames.FRAME_ID_PUBLISHER, Id3FieldType.TEXT),
+    RECORDING_ENGINEER(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RECORDING_ENGINEER, Id3FieldType.TEXT),
+    RECORDING_ENGINEER_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RECORDING_ENGINEER_SORT, Id3FieldType.TEXT),
     RECORDINGDATE(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RECORDINGDATE, Id3FieldType.TEXT),
     RECORDINGSTARTDATE(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RECORDINGSTARTDATE, Id3FieldType.TEXT),
     RECORDINGENDDATE(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.RECORDINGENDDATE, Id3FieldType.TEXT),
@@ -161,6 +173,8 @@ public enum ID3v24FieldKey
     SECTION(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.SECTION, Id3FieldType.TEXT),
     SINGLE_DISC_TRACK_NO(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.SINGLE_DISC_TRACK_NO, Id3FieldType.TEXT),
     SONGKONG_ID(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.SONGKONG_ID, Id3FieldType.TEXT),
+    SOUND_ENGINEER(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.SOUND_ENGINEER, Id3FieldType.TEXT),
+    SOUND_ENGINEER_SORT(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.SOUND_ENGINEER_SORT, Id3FieldType.TEXT),
     SUBTITLE(ID3v24Frames.FRAME_ID_TITLE_REFINEMENT, Id3FieldType.TEXT),
     TAGS(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.TAGS, Id3FieldType.TEXT),
     TEMPO(ID3v24Frames.FRAME_ID_COMMENT, FrameBodyCOMM.MM_TEMPO,Id3FieldType.TEXT),
@@ -172,6 +186,8 @@ public enum ID3v24FieldKey
     TONALITY(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO, FrameBodyTXXX.TONALITY, Id3FieldType.TEXT),
     TRACK(ID3v24Frames.FRAME_ID_TRACK, Id3FieldType.TEXT),
     TRACK_TOTAL(ID3v24Frames.FRAME_ID_TRACK, Id3FieldType.TEXT),
+    URL_BANDCAMP_ARTIST_SITE(ID3v24Frames.FRAME_ID_USER_DEFINED_URL, FrameBodyWXXX.URL_BANDCAMP_ARTIST_SITE, Id3FieldType.TEXT),
+    URL_BANDCAMP_RELEASE_SITE(ID3v24Frames.FRAME_ID_USER_DEFINED_URL, FrameBodyWXXX.URL_BANDCAMP_RELEASE_SITE, Id3FieldType.TEXT),
     URL_DISCOGS_ARTIST_SITE(ID3v24Frames.FRAME_ID_USER_DEFINED_URL, FrameBodyWXXX.URL_DISCOGS_ARTIST_SITE, Id3FieldType.TEXT),
     URL_DISCOGS_RELEASE_SITE(ID3v24Frames.FRAME_ID_USER_DEFINED_URL, FrameBodyWXXX.URL_DISCOGS_RELEASE_SITE, Id3FieldType.TEXT),
     URL_LYRICS_SITE(ID3v24Frames.FRAME_ID_USER_DEFINED_URL, FrameBodyWXXX.URL_LYRICS_SITE, Id3FieldType.TEXT),
@@ -261,12 +277,34 @@ public enum ID3v24FieldKey
     }
 
     /**
-     * This is the value of the key that can uniquely identifer a key type
+     * This is the value of the key that can uniquely identifier a key type
      *
      * @return
      */
     public String getFieldName()
     {
         return fieldName;
+    }
+
+    static Map<String,ID3v24FieldKey> frameIdFieldKeyMapping = new LinkedHashMap<String,ID3v24FieldKey>();
+
+    static
+    {
+        for(ID3v24FieldKey field:ID3v24FieldKey.values())
+        {
+            if(field.getSubId()!=null)
+            {
+                frameIdFieldKeyMapping.put(field.getFrameId() + field.getSubId(), field);
+            }
+            else
+            {
+                frameIdFieldKeyMapping.put(field.getFrameId(), field);
+            }
+        }
+    }
+
+    public static ID3v24FieldKey getFieldKeyFromFrameId(String frameId)
+    {
+        return frameIdFieldKeyMapping.get(frameId);
     }
 }

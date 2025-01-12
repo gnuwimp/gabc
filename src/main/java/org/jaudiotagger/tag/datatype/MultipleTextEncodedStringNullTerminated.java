@@ -89,7 +89,7 @@ public class MultipleTextEncodedStringNullTerminated extends AbstractDataType
             try
             {
                 //Read String
-                TextEncodedStringNullTerminated next = new TextEncodedStringNullTerminated(identifier, frameBody);
+                TextEncodedStringNullTerminated next = new TextEncodedStringNullTerminated(identifier, frameBody, true);
                 next.readByteArray(arr, offset);
 
                 if (next.getSize() == 0)

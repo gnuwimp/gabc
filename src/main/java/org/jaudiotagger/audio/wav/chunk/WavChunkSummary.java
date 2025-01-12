@@ -1,9 +1,11 @@
 package org.jaudiotagger.audio.wav.chunk;
 
+import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.iff.ChunkSummary;
 import org.jaudiotagger.audio.wav.WavChunkType;
 import org.jaudiotagger.tag.wav.WavTag;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -47,8 +49,11 @@ public class WavChunkSummary
         }
 
         boolean firstMetadataTag = false;
+
         for(ChunkSummary cs:tag.getChunkSummaryList())
         {
+            //Once we have found first metadata chunk we check all other chunks afterwards and if they are
+            //only metadata chunks we can truncate file at start of this metadata chunk
             if(firstMetadataTag)
             {
                 if(
@@ -63,6 +68,7 @@ public class WavChunkSummary
             }
             else
             {
+                //Found the first metadata chunk
                 if (cs.getFileStartLocation() == startLocationOfMetadatTag)
                 {
                     //Found starting point

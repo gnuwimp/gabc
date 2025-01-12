@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2024 gnuwimp@gmail.com
+ * Copyright 2016 - 2025 gnuwimp@gmail.com
  * Released under the GNU General Public License v3.0
  */
 
@@ -30,13 +30,13 @@ class Tab1Task(val parameters: Tab1Parameters) : Task(max = parameters.audioFile
                 val buffer        = ByteArray(size = 131_072)
                 val decoderParams = Decoder.create(file, parameters.mono)
                 var parseHeader   = true
+                message           = "${file.filename}\n${parameters.outputFileName}"
 
                 Swing.logMessage = decoderParams.joinToString(separator = " ")
 
-                decoderBuilder    = ProcessBuilder(decoderParams)
-                decoderProcess    = decoderBuilder.start()
-                decoderStream     = decoderProcess.inputStream
-                ConvertManager.tm = "Current file '${file.name}'\nResult file '${parameters.outputFile.name}'"
+                decoderBuilder = ProcessBuilder(decoderParams)
+                decoderProcess = decoderBuilder.start()
+                decoderStream  = decoderProcess.inputStream
 
                 while (decoderProcess.isAlive == true) {
                     val read = decoderStream.read(buffer)
@@ -55,7 +55,7 @@ class Tab1Task(val parameters: Tab1Parameters) : Task(max = parameters.audioFile
                             val seconds       = parameters.gap.numOrZero.toInt()
 
                             if (seconds != 0) {
-                                gap = ByteArray(size = (wavHeader.sampleRate * wavHeader.channels * 2 * seconds))
+                                gap = ByteArray(size = (wavHeader.sampleRate * wavHeader.channels.ordinal * 2 * seconds))
                             }
 
                             encoderStream?.write(buffer, wavHeader.data, read - wavHeader.data)
