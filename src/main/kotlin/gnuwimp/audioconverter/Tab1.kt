@@ -404,6 +404,16 @@ class Tab1 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
                 JOptionPane.showMessageDialog(this, message, Constants.APP_NAME, JOptionPane.INFORMATION_MESSAGE)
             }
         }
+        catch (e: FileExistException) {
+            if (auto != Constants.Auto.NO) {
+                println("${e.message}")
+                Main.window.quit()
+            }
+            else {
+                Swing.errorMessage = e.message ?: "!"
+                JOptionPane.showMessageDialog(this, e.message, Constants.APP_NAME, JOptionPane.ERROR_MESSAGE)
+            }
+        }
         catch (e: Exception) {
             if (file != null && file.isFile == true) {
                 file.remove()

@@ -247,7 +247,7 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
         }
 
         if (tasks.isEmpty() == true) {
-            throw Exception("error: no files to convert\nall files already converted")
+            throw FileExistException("error: no files to convert\nall files already converted")
         }
 
         return tasks
@@ -290,6 +290,16 @@ class Tab2 : LayoutPanel(size = Swing.defFont.size / 2 + 1) {
             }
             else {
                 JOptionPane.showMessageDialog(this, message, Constants.APP_NAME, JOptionPane.INFORMATION_MESSAGE)
+            }
+        }
+        catch (e: FileExistException) {
+            if (auto != Constants.Auto.NO) {
+                println("${e.message}")
+                Main.window.quit()
+            }
+            else {
+                Swing.errorMessage = e.message ?: "!"
+                JOptionPane.showMessageDialog(this, e.message, Constants.APP_NAME, JOptionPane.ERROR_MESSAGE)
             }
         }
         catch (e: Exception) {

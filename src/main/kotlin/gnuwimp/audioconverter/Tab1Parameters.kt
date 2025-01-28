@@ -66,6 +66,10 @@ class Tab1Parameters(val audioFiles: List<FileInfo>, val source: String, val des
 
                 if (year.isBlank() == true) {
                     year = tag0.getFirst(FieldKey.YEAR)
+
+                    if (year.length > 4) {
+                        year = year.substring(0, 4)
+                    }
                 }
 
                 image = tag0.firstArtwork
@@ -78,7 +82,7 @@ class Tab1Parameters(val audioFiles: List<FileInfo>, val source: String, val des
             cover.isNotBlank() && File(cover).isImage == false -> throw Exception("error: image cover file is not an valid image")
             artist.isBlank() -> throw Exception("error: artist/author string is empty")
             album.isBlank() -> throw Exception("error: title string is empty")
-            year != "" && (year.numOrZero < 1 || year.numOrZero > 9999) -> throw Exception("error: year is out of range $year (1 - 9999)")
+            year != "" && (year.numOrZero < 1900 || year.numOrZero > 2100) -> throw Exception("error: year is out of range $year (1900 - 2100)")
         }
 
         val out_file = FileInfo(outputFileName)
@@ -98,7 +102,7 @@ class Tab1Parameters(val audioFiles: List<FileInfo>, val source: String, val des
             }
 
             if (count == 0) {
-                throw Exception("error: destination file '${out_file.filename}' is newer than the input files!")
+                throw FileExistException("error: destination file '${out_file.filename}' is newer than the input files!")
             }
         }
 

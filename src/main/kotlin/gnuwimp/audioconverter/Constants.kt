@@ -22,7 +22,7 @@ object Constants {
     const val TAB1_AUTHORINPUT_TOOLTIP   = "Set artist/author name."
     const val TAB1_COMMENTINPUT_TOOLTIP  = "Set comment string (optional)."
     const val TAB1_TITLEINPUT_TOOLTIP    = "Set title/artist name."
-    const val TAB1_YEARINPUT_TOOLTIP     = "Set year for the audio book (optional, 1 - 9999)."
+    const val TAB1_YEARINPUT_TOOLTIP     = "Set year for the audio book (optional, 1900 - 2100)."
     const val TAB1_GENREINPUT_TOOLTIP    = "Set track genre (optional)."
     const val TAB1_GAPCOMBO_TOOLTIP      = "Insert silence between tracks (0 - 5 seconds)."
     const val TAB1_CHANNELMONO_TOOLTIP   = "Convert stereo tracks to mono."
@@ -82,14 +82,14 @@ object Constants {
             "--title [TEXT]             album and title name\n" +
             "--comment [TEXT]           comment string (optional)\n" +
             "--cover [PATH]             track cover image (optional)\n" +
-            "--year [YYYY]              track year (optional, 1 - 9999)\n" +
+            "--year [YYYY]              track year (optional, 1900 - 2100)\n" +
             "--genre [TEXT]             genre string (optional, default ${Tab1Parameters.DEFAULT_GENRE})\n" +
             "--gap [SECONDS]            insert silence between tracks (optional, default 0)\n" +
             "                             valid values are: 0 - 5\n" +
             "--mono                     downmix stereo to mono (optional)\n" +
+            "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             "--overwrite [VALUE]        overwrite destination files (optional, default 0)\n" +
             "                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all\n" +
-            "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             Encoders.toHelp +
             "--auto                     start automatically and quit after successful encoding (optional)\n" +
             "--auto2                    start automatically and quit even for error (optional)\n" +
@@ -124,9 +124,9 @@ object Constants {
             "--dest [PATH]              destination directory for target file\n" +
             "--threads [COUNT]          set number of threads to use (optional, default 1)\n" +
             "                             valid values are: 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 24, 32, 48, 64, 96, 128\n" +
+            "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             "--overwrite [VALUE]        overwrite destination files (optional, default 0)\n" +
             "                             valid values are: 0 dont overwrite, 1 overwrite older, 3 overwrite all\n" +
-            "--encoder [INDEX]          index in encoder list (optional, default ${Encoders.DEFAULT.ordinal} -> MP3 CBR 128 Kbps)\n" +
             Encoders.toHelp +
             "--auto                     start automatically and quit after successful encoding (optional)\n" +
             "--auto2                    start automatically and quit even for error (optional)\n" +
@@ -138,7 +138,7 @@ object Constants {
     fun aboutApp(): String {
         var about = "<html>" +
 
-        "<h2>AudioConverter 2.6</h2>" +
+        "<h2>AudioConverter 2.6.1</h2>" +
 
         "Copyright 2021 - 2025 gnuwimp@gmail.com.<br>" +
         "Released under the GNU General Public License v3.0.<br>" +
