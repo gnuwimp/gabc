@@ -94,6 +94,8 @@ To convert file to file use these arguments:
 
 ## Changes
 <pre>
+2.6.1:  minor bug fixes and improvements
+
 2.6:    added overwrite destination files option
         some bug fixes and improvements
 
